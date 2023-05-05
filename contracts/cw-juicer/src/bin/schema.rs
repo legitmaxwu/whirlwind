@@ -1,6 +1,6 @@
 use cosmwasm_schema::write_api;
 
-use whirlwind::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use cw_juicer::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
 fn main() {
     write_api! {
