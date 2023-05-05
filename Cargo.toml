@@ -49,5 +49,9 @@ schemars = "0.8.10"
 serde = { version = "1.0.145", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.31" }
 
+lib = { path = "./packages/lib" }
+cw-utils = "1.0.1"
+
+
 [dev-dependencies]
 cw-multi-test = "0.16.2"

@@ -1,0 +1,35 @@
+[package]
+name = "lib"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cosmwasm-std = { version = "1.0.0" }
+
+serde = { version = "1.0.103", default-features = false, features = ["derive"] }
+# serde_json = { version = "1.0.48",  default-features = false, features = ["float_roundtrip"] }
+serde_json = { package="serde-json-wasm", version="0.4.0"}
+
+schemars = "0.8.1"
+
+bech32 = "0.8.1"
+
+ark-ff = { version = "^0.3.0", default-features = false }
+ark-std = { version = "^0.3.0", default-features = false }
+ark-bn254 = { version = "^0.3.0", default-features = false, features = [ "curve" ] }
+ark-bls12-381 = { version = "^0.3.0", default-features = false, features = [ "curve" ] }
+ark-bls12-377 = { version = "^0.3.0", default-features = false, features = [ "curve", "r1cs" ], optional = true }
+ark-crypto-primitives = { version = "^0.3.0", features = ["r1cs"], default-features = false }
+
+arkworks-setups = { version = "0.5.3", default-features = false }
+arkworks-native-gadgets = { version = "0.5.3", default-features = false }
+
+ark-ec = { version = "^0.3.0", default-features = false }
+ark-groth16 = { version = "^0.3.0", default-features = false }
+ark-serialize = { version = "^0.3.0", default-features = false }
+
+lazy_static = "1.4.0"
+
+# ff = {package="ff_ce", version="0.13.1", features = ["derive"]}

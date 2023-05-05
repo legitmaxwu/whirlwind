@@ -1,0 +1,14 @@
+input.json
+withdraw.r1cs
+withdraw.sym
+circuit_final.zkey
+phase1_final.ptau
+phase2_final.ptau
+withdraw_0000.zkey
+withdraw_0001.zkey
+withdraw_constraints.json
+withdraw_js/
+witness.wtnsproof.json
+public.json
+proof.json
+witness.wtns
