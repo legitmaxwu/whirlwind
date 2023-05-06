@@ -76,22 +76,40 @@ impl MerkleTreeWithHistory {
 
         for i in 0..(self.levels) {
             if idx % 2 == 0 {
+                println!("level: {}. left", idx);
+
                 left = &current_level_hash;
                 right = &self.zeros[i as usize];
 
+                println!("current_level_hash: {}", right);
+
+
                 self.filled_subtrees[i as usize] = current_level_hash;
             } else {
+                println!("level: {}. right", idx);
+
                 left = &self.filled_subtrees[i as usize];
                 right = &current_level_hash;
+
+                println!("current_level_hash: {}", left);
+
             }
 
             current_level_hash = self.hash_left_right(left, right);
 
+
             idx /= 2;
         }
+        println!("root: {}", current_level_hash);
+
+        println!("\n\n\n\n");
+
+
+
 
         self.current_root_index = (self.current_root_index + 1) % ROOT_HISTORY_SIZE;
         self.roots[self.current_root_index as usize] = current_level_hash;
+
         Some(self.next_index - 1)
     }
 
