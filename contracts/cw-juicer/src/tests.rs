@@ -66,6 +66,7 @@ fn test_withdraw_1() {
             .to_string(),
     };
 
+
     let deposit_msg = DepositMsg {
         commitment: deposit.clone().get_commitment(),
     };
@@ -79,6 +80,8 @@ fn test_withdraw_1() {
         .insert(&U256::from_str(&deposit.clone().get_commitment()).unwrap())
         .unwrap();
 
+    // Print merkle tree info;
+
     COMMITMENTS.save(&mut deps.storage, &tree).unwrap();
 
     //withdraw will fail with balance check. Comment out balance check to pass.
@@ -89,11 +92,20 @@ fn test_withdraw_1() {
             "#.to_string(),
         ),
         root: "7867364560627547019086598689541673085228895175200585554350937642876639323043".to_string(),
-        nullifier_hash: deposit.get_nullifier_hash((leaf_index) as u128),
+        nullifier_hash: deposit.clone().get_nullifier_hash((leaf_index) as u128),
         recipient: "juno14spgzl9ps5tyev32ny74fa6m0s9q9828v0vrga".to_string(),
         relayer: "juno1am5sw4geda8xfvmn4pkzruhv8ah0l3jx5hgchh".to_string(),
         fee: U128::from(0_u128),
     });
+
+    println!("nullifier: {}", deposit.clone().nullifier);
+    println!("nullifierHash: {}", deposit.get_nullifier_hash((leaf_index) as u128));
+    // println!("root: {}", tree.get_last_root());
+
+    println!("recipient: {}", "juno14spgzl9ps5tyev32ny74fa6m0s9q9828v0vrga".to_string());
+    println!("relayer: {}", "juno1am5sw4geda8xfvmn4pkzruhv8ah0l3jx5hgchh".to_string());
+    println!("fee: {}", U128::from(0_u128));
+
     let info = mock_info(ALICE, &[]);
 
     let res = execute(deps.as_mut(), mock_env(), info, msg).unwrap();

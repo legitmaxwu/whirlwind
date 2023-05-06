@@ -80,7 +80,7 @@ pub fn execute_deposit(
     info: MessageInfo,
     msg: DepositMsg,
 ) -> Result<Response, ContractError> {
-    assert_sent_exact_coin(&info.funds, Some(coin(10_000_000_000, JUNO)))?;
+    // assert_sent_exact_coin(&info.funds, Some(coin(10_000_000_000, JUNO)))?;
 
     let mut commitment_mt = COMMITMENTS.load(deps.storage)?;
     //confirm insert worked
@@ -88,6 +88,7 @@ pub fn execute_deposit(
     if success.is_none() {
         return Err(ContractError::InsertFailed {});
     }
+
     COMMITMENTS.save(deps.storage, &commitment_mt)?;
 
     Ok(Response::new()
@@ -107,12 +108,12 @@ pub fn execute_withdraw(
     }
 
     // Check contract funds
-    let balance = deps.querier.query_balance(env.contract.address, JUNO)?;
-    if balance.amount <= U128::from(9_960_000_000_u128) {
-        return Err(ContractError::ContractBalanceEmpty {
-            amount: balance.amount,
-        });
-    }
+    // let balance = deps.querier.query_balance(env.contract.address, JUNO)?;
+    // if balance.amount <= U128::from(9_960_000_000_u128) {
+    //     return Err(ContractError::ContractBalanceEmpty {
+    //         amount: balance.amount,
+    //     });
+    // }
 
     let public_signals = PublicSignals::from_values(
         msg.root.clone(),
