@@ -3,7 +3,7 @@ members = [
     "contracts/cw-juicer",
     "contracts/whirlwind-swap",
     "packages/lib",
-    "generate-proof-data"
+    "generate-data"
 ]
 
 [workspace.dependencies]

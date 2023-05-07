@@ -1,5 +1,5 @@
 import * as snarkjs from "snarkjs";
-import proofInputs from "../generate-proof-data/outputs/proofInputs.json";
+import proofInputs from "../generate-data/outputs/proofInputs.json";
 import * as fs from "fs";
 
 const makeProof = async (_proofInput: any, _wasm: string, _zkey: string) => {
@@ -10,9 +10,9 @@ const makeProof = async (_proofInput: any, _wasm: string, _zkey: string) => {
 function getFileNames(type: string) {
   const lower = type.toLowerCase();
   return {
-    wasmFile: `../build/${lower}/${lower}_js/${lower}.wasm`,
-    provingKeyFile: `../build/${lower}/${lower}.zkey`,
-    verificationKeyFile: `../build/${lower}/${lower}.vk.json`,
+    wasmFile: `../circuits/build/${lower}/${lower}_js/${lower}.wasm`,
+    provingKeyFile: `../circuits/build/${lower}/${lower}.zkey`,
+    verificationKeyFile: `../circuits/build/${lower}/${lower}.vk.json`,
   };
 }
 
