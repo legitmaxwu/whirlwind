@@ -416,8 +416,8 @@ pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractEr
                 counter,
             } = SWAP_CTX.load(deps.storage)?;
 
-            // TODO(!): Get output of Osmosis transaction
-            // from transaction success
+            // Output of Osmosis swap is the difference between 
+            // the output denom balance before and after swap
             let output_balance_after_swap =
                 get_denom_balance(deps.as_ref(), output_denom.clone(), env.contract.address)?;
             let output_amount = output_balance_after_swap
