@@ -25,4 +25,10 @@ pub enum ContractError {
 
     #[error("Invalid proof")]
     InvalidProof {},
+
+    #[error("Invalid deposit credential")]
+    InvalidDepositCredential {},
+
+    #[error("Invalid pool ID")]
+    InvalidPoolId { id: String },
 }

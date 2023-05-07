@@ -20,6 +20,10 @@ impl Verifier {
         }
     }
 
+    pub fn from_vk(vk_json: String) -> Self {
+        Self { vk_json }
+    }
+
     pub fn verify_proof(self, proof: Proof<Bn254>, inputs: &[Fr]) -> bool {
         let vk_json: VerifyingKeyJson = serde_json::from_str(&self.vk_json).unwrap();
 
