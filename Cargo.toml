@@ -8,4 +8,5 @@ members = [
 [workspace.dependencies]
 cosmwasm-bignumber = "2.2.0"
 cw2 = "1.0.1"
+cw20 = "1.0.1"
 lib = { path = "./packages/lib" }

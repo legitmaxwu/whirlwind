@@ -2,8 +2,9 @@ use std::str::FromStr;
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint256, Uint128};
+use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint256, Uint128, CosmosMsg, WasmMsg, to_binary};
 use cw2::set_contract_version;
+use cw20::Cw20ExecuteMsg;
 
 use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
@@ -53,12 +54,36 @@ pub fn execute(
 pub fn execute_deposit(
     deps: DepsMut,
     info: MessageInfo,
+    env: Env,
     commitment: String 
 ) -> Result<Response, ContractError> {
     // confirm deposit amount and denom
     let deposit_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
     let deposit_denom = DEPOSIT_DENOM.load(deps.storage)?;
-    // TODO(!): Confirm deposit amount and denom
+    let mut msgs: Vec<CosmosMsg> = vec![];
+    match deposit_denom {
+        Denom::Native(denom) => {
+            if info.funds.len() != 1 {
+                return Err(ContractError::InvalidDeposit {  });
+            }
+            if info.funds[0].amount != deposit_amount {
+                return Err(ContractError::InvalidDeposit {  });
+            }
+            if info.funds[0].denom != denom {
+                return Err(ContractError::InvalidDeposit {  });
+            }
+        },
+        Denom::Cw20(addr) => {
+            msgs.push(CosmosMsg::Wasm(WasmMsg::Execute {
+                contract_addr: addr.to_string(),
+                msg: to_binary(&Cw20ExecuteMsg::Transfer {
+                    recipient: env.contract.address.to_string(),
+                    amount: deposit_amount,
+                })?,
+                funds: vec![],
+            }));
+        }
+    }
 
     let mut commitment_mt = COMMITMENTS.load(deps.storage)?;
     // confirm insert worked
@@ -70,6 +95,7 @@ pub fn execute_deposit(
     COMMITMENTS.save(deps.storage, &commitment_mt)?;
 
     Ok(Response::new()
+        .add_messages(msgs)
         .add_attribute("action", "deposit")
         .add_attribute("from", info.sender))
 }
