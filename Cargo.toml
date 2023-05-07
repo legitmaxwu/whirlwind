@@ -2,7 +2,8 @@
 members = [
     "contracts/cw-juicer",
     "contracts/whirlwind-swap",
-    "packages/*",
+    "packages/lib",
+    "circuits/proofs"
 ]
 
 [workspace.dependencies]
@@ -10,3 +11,4 @@ cosmwasm-bignumber = "2.2.0"
 cw2 = "1.0.1"
 cw20 = "1.0.1"
 lib = { path = "./packages/lib" }
+arkworks-native-gadgets = { path = "./packages/arkworks-native-gadgets-0.5.3" }

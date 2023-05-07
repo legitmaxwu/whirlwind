@@ -16,3 +16,5 @@ witness.wtns
 
 build/
 powersOfTau28*
+*/node_modules/
+proofs/package-lock.json

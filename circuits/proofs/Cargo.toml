@@ -1,0 +1,15 @@
+[package]
+name = "proofs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ark-bn254 = "0.4.0"
+ark-circom = { git = "https://github.com/gakonst/ark-circom.git" }
+ark-crypto-primitives = "0.4.0"
+ark-ec = "0.4.2"
+ark-groth16 = { version="0.4.0", default-features = false, features = ["parallel"] }
+ark-std = "0.4.0"
+lib = { workspace = true }

@@ -13,6 +13,11 @@ template Deposit() {
   component depositCredentialHasher = Poseidon(2);
   depositCredentialHasher.inputs[0] <== walletAddress;
   depositCredentialHasher.inputs[1] <== secret;
+
+  log("walletAddress", walletAddress);
+  log("secret", secret);
+  log("depositCredentialHasher.out", depositCredentialHasher.out);
+  log("depositCredential", depositCredential);
   depositCredential === depositCredentialHasher.out;
 }
 

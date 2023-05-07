@@ -124,10 +124,8 @@ mod tests {
         let right = U256::from(2_u16);
 
         let inputs = vec![left.to_le_bytes(), right.to_le_bytes()];
-        println!("{:?}", inputs);
 
         let h = hasher.hash(inputs).unwrap();
         let n = U256::from_le_bytes(h);
-        println!("{:?}", n);
     }
 }

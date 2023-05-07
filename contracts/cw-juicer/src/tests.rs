@@ -98,13 +98,13 @@ fn test_withdraw_1() {
         fee: U128::from(0_u128),
     });
 
-    println!("nullifier: {}", deposit.clone().nullifier);
-    println!("nullifierHash: {}", deposit.get_nullifier_hash((leaf_index) as u128));
-    // println!("root: {}", tree.get_last_root());
+    // println!("nullifier: {}", deposit.clone().nullifier);
+    // println!("nullifierHash: {}", deposit.get_nullifier_hash((leaf_index) as u128));
+    // // println!("root: {}", tree.get_last_root());
 
-    println!("recipient: {}", "juno14spgzl9ps5tyev32ny74fa6m0s9q9828v0vrga".to_string());
-    println!("relayer: {}", "juno1am5sw4geda8xfvmn4pkzruhv8ah0l3jx5hgchh".to_string());
-    println!("fee: {}", U128::from(0_u128));
+    // println!("recipient: {}", "juno14spgzl9ps5tyev32ny74fa6m0s9q9828v0vrga".to_string());
+    // println!("relayer: {}", "juno1am5sw4geda8xfvmn4pkzruhv8ah0l3jx5hgchh".to_string());
+    // println!("fee: {}", U128::from(0_u128));
 
     let info = mock_info(ALICE, &[]);
 
