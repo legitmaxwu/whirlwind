@@ -5,12 +5,11 @@
 # edition = "2021"
 
 [workspace]
-resolver = "2"
 members = [
     "contracts/cw-juicer",
-    "contracts/whirlwind",
+    # "contracts/whirlwind-swap",
     "packages/*",
 ]
 
 [workspace.dependencies]
-cw-juicer = { path = "contracts/cw-juicer" }
+lib = { path = "./packages/lib" }
