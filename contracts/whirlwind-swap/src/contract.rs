@@ -16,8 +16,8 @@ use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{
     Denom, DenomOwnership, SwapContext, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
-    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_DEPOSIT_VERIFIER, SWAP_VERIFIER, DEPOSIT_VERIFIER,
-    WITHDRAW_VERIFIER,
+    DEPOSIT_VERIFIER, NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_DEPOSIT_VERIFIER,
+    SWAP_VERIFIER, WITHDRAW_VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
@@ -50,7 +50,7 @@ pub fn instantiate(
     let swap_v = Verifier::from_vk(msg.vk_swap);
     let withdraw_v = Verifier::from_vk(msg.vk_withdraw);
 
-    DEPOSIT_VERIFIER.save(deps.storage, &deposit_v)?;  
+    DEPOSIT_VERIFIER.save(deps.storage, &deposit_v)?;
     SWAP_DEPOSIT_VERIFIER.save(deps.storage, &swap_deposit_v)?;
     SWAP_VERIFIER.save(deps.storage, &swap_v)?;
     WITHDRAW_VERIFIER.save(deps.storage, &withdraw_v)?;
@@ -75,7 +75,9 @@ pub fn execute(
             withdraw_addr,
         } => {
             let withdraw_addr = deps.api.addr_validate(&withdraw_addr)?;
-            execute_deposit(deps, info, env, proof, deposit_credential, withdraw_addr)
+            // TODO(!): Convert proof to native type here
+            // execute_deposit(deps, info, env, proof, deposit_credential, withdraw_addr)
+            unimplemented!()
         }
         _ => unimplemented!(),
     }
@@ -85,8 +87,8 @@ pub fn execute_deposit(
     deps: DepsMut,
     info: MessageInfo,
     env: Env,
-    proof: String,
-    deposit_credential: String,
+    proof: Proof<Bn254>,
+    deposit_credential_hash: String,
     withdraw_addr: Addr,
 ) -> Result<Response, ContractError> {
     // confirm deposit amount and denom
@@ -116,12 +118,21 @@ pub fn execute_deposit(
             }));
         }
     }
-    // TODO(max): Verify proof here
+    // Verify SNARK
+    let verifier = DEPOSIT_VERIFIER.load(deps.storage)?;
+    let public_signals = PublicSignals(vec![
+        withdraw_addr.to_string(),
+        deposit_credential_hash.clone(),
+    ]);
+    let success = verifier.verify_proof(proof, &public_signals.get());
+    if !success {
+        return Err(ContractError::InvalidProof {});
+    }
 
     // insert commitment into merkle tree
     let mut commitment_mt = COMMITMENTS.load(deps.storage)?;
     // confirm insert worked
-    let success = commitment_mt.insert(&Uint256::from_str(&deposit_credential)?);
+    let success = commitment_mt.insert(&Uint256::from_str(&deposit_credential_hash)?);
     if success.is_none() {
         return Err(ContractError::InvalidCommitment {});
     }
@@ -140,7 +151,7 @@ pub fn execute_swap_deposit(
     proof: Proof<Bn254>,
     root: String,
     nullifier_hash: String,
-    deposit_credential_hash: String,
+    new_deposit_credential_hash: String,
     min_output: Uint128,
     output_denom: Denom,
 ) -> Result<Response, ContractError> {
@@ -165,7 +176,7 @@ pub fn execute_swap_deposit(
     let public_signals = PublicSignals(vec![
         root.clone(),
         nullifier_hash.clone(),
-        deposit_credential_hash.clone(),
+        new_deposit_credential_hash.clone(),
     ]);
     let success = verifier.verify_proof(proof, &public_signals.get());
     if !success {
@@ -184,11 +195,11 @@ pub fn execute_swap_deposit(
         deps.storage,
         &SwapContext {
             // This is to save the output of the swap into the contract state
-            deposit_credential_hash: deposit_credential_hash.clone(),
+            deposit_credential_hash: new_deposit_credential_hash.clone(),
             output_denom,
-            // This number is the first `n + 1` due to swap deposit
+            // This number is the first `C_n` due to swap deposit
             // See design document for more details.
-            counter: 3,
+            counter: 2,
         },
     )?;
 
