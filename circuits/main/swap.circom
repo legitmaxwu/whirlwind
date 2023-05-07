@@ -1,7 +1,7 @@
 pragma circom 2.0.0;
 
-include "./circomlib/circuits/poseidon.circom";
-include "merkleTree.circom";
+include "../circomlib/circuits/poseidon.circom";
+include "../lib/merkleTree.circom";
 
 template Swap(levels) {
   // Private
