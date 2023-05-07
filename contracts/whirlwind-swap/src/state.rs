@@ -40,6 +40,7 @@ pub const OWNERSHIP_HASHES: Map<String, (DenomOwnership, u32)> = Map::new("owner
 #[cw_serde]
 pub struct SwapContext {
     pub deposit_credential_hash: String,
+    pub output_balance_before_swap: Uint128,
     pub output_denom: Denom,
     pub counter: u32
 }

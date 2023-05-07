@@ -205,7 +205,7 @@ pub fn execute_swap_deposit(
     let input_denom = DEPOSIT_DENOM.load(deps.storage)?;
     let input_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
     let msg = get_osmosis_swap_msg(
-        env.contract.address,
+        env.contract.address.clone(),
         routes,
         input_amount,
         input_denom,
@@ -213,11 +213,14 @@ pub fn execute_swap_deposit(
         output_denom.clone(),
     )?;
     let sub_msg = SubMsg::reply_on_success(msg, SWAP_REPLY_ID);
+    let output_balance_before_swap =
+        get_denom_balance(deps.as_ref(), output_denom.clone(), env.contract.address)?;
     SWAP_CTX.save(
         deps.storage,
         &SwapContext {
             // This is to save the output of the swap into the contract state
             deposit_credential_hash: new_deposit_credential_hash.clone(),
+            output_balance_before_swap,
             output_denom,
             // This number is the first `C_n` due to swap deposit
             // See design document for more details.
@@ -263,7 +266,7 @@ pub fn execute_swap(
 
     // Add swap message with reply handler
     let msg = get_osmosis_swap_msg(
-        env.contract.address,
+        env.contract.address.clone(),
         routes,
         ownership.amount,
         ownership.denom,
@@ -271,11 +274,14 @@ pub fn execute_swap(
         output_denom.clone(),
     )?;
     let sub_msg = SubMsg::reply_on_success(msg, SWAP_REPLY_ID);
+    let output_balance_before_swap =
+        get_denom_balance(deps.as_ref(), output_denom.clone(), env.contract.address)?;
     SWAP_CTX.save(
         deps.storage,
         &SwapContext {
             // This is to save the output of the swap into the contract state
             deposit_credential_hash: new_deposit_credential_hash.clone(),
+            output_balance_before_swap,
             output_denom,
             counter: counter + 1,
         },
@@ -349,7 +355,7 @@ pub fn execute_update_allowed_pools(
     info: MessageInfo,
     pools: Vec<String>,
 ) -> Result<Response, ContractError> {
-    // No admin makes allowed pool list immutable 
+    // No admin makes allowed pool list immutable
     let admin = POOL_ADMIN.load(deps.storage)?;
     if info.sender != admin {
         return Err(ContractError::Unauthorized {});
@@ -400,25 +406,34 @@ pub fn get_osmosis_swap_msg(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractError> {
+pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractError> {
     match msg.id {
         SWAP_REPLY_ID => {
             let SwapContext {
                 deposit_credential_hash,
+                output_balance_before_swap,
                 output_denom,
                 counter,
             } = SWAP_CTX.load(deps.storage)?;
 
             // TODO(!): Get output of Osmosis transaction
             // from transaction success
+            let output_balance_after_swap =
+                get_denom_balance(deps.as_ref(), output_denom.clone(), env.contract.address)?;
+            let output_amount = output_balance_after_swap
+                .checked_sub(output_balance_before_swap)
+                .map_err(|_| {
+                    ContractError::Std(StdError::GenericErr {
+                        msg: "Output amount overflow".to_string(),
+                    })
+                })?;
 
             OWNERSHIP_HASHES.save(
                 deps.storage,
                 deposit_credential_hash,
                 &(
                     DenomOwnership {
-                        // TODO(!): Get output amount from Osmosis transaction
-                        amount: Uint128::zero(),
+                        amount: output_amount,
                         denom: output_denom,
                     },
                     counter,
@@ -429,6 +444,24 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
         _ => Err(ContractError::Std(StdError::GenericErr {
             msg: "Unknown reply ID".to_string(),
         })),
+    }
+}
+
+fn get_denom_balance(deps: Deps, denom: Denom, target_addr: Addr) -> StdResult<Uint128> {
+    match denom {
+        Denom::Native(denom) => {
+            let balance = deps.querier.query_balance(target_addr, denom)?;
+            Ok(balance.amount)
+        }
+        Denom::Cw20(cw20_addr) => {
+            let cw20::BalanceResponse { balance } = deps.querier.query_wasm_smart(
+                cw20_addr.clone(),
+                &cw20::Cw20QueryMsg::Balance {
+                    address: target_addr.to_string(),
+                },
+            )?;
+            Ok(balance)
+        }
     }
 }
 
