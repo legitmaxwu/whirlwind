@@ -17,8 +17,9 @@ template WithdrawNFT() {
   depositCredentialHasher.inputs[1] <== secret;
   depositCredential <== depositCredentialHasher.out;
 
-  component nftCredentialHasher = Poseidon(1);
-  nftCredentialHasher.inputs[0] <== depositCredential + n;
+  component nftCredentialHasher = Poseidon(2);
+  nftCredentialHasher.inputs[0] <== depositCredential;
+  nftCredentialHasher.inputs[1] <== n;
   nftCredential === nftCredentialHasher.out;
 }
 
