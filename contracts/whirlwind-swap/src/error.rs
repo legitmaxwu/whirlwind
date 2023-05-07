@@ -16,4 +16,13 @@ pub enum ContractError {
 
     #[error("Invalid deposit")]
     InvalidDeposit {},
+
+    #[error("Duplicate commitment")]
+    DuplicateCommitment {},
+
+    #[error("Unknown root")]
+    UnknownRoot {},
+
+    #[error("Invalid proof")]
+    InvalidProof {},
 }

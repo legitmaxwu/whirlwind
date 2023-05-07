@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use ark_bn254::Bn254;
+use ark_groth16::Proof;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
@@ -8,10 +10,14 @@ use cosmwasm_std::{
 };
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg;
+use lib::msg::PublicSignals;
 
 use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{Denom, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM, VERIFIER, SWAP_DEPOSIT_CTX, SwapDepositCtx};
+use crate::state::{
+    Denom, SwapDepositCtx, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM, NULLIFIER_HASHES,
+    SWAP_DEPOSIT_CTX, VERIFIER,
+};
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
 
@@ -122,25 +128,56 @@ pub fn execute_deposit(
 pub fn execute_swap_deposit(
     deps: DepsMut,
     info: MessageInfo,
-    output_denom: Denom,
+    proof: Proof<Bn254>,
+    root: String,
+    nullifier_hash: String,
+    deposit_credential_hash: String,
     min_output: Uint128,
+    output_denom: Denom,
 ) -> Result<Response, ContractError> {
     // Reject if nullifier hash is in map
+    match NULLIFIER_HASHES.may_load(deps.storage, nullifier_hash.clone())? {
+        Some(_) => return Err(ContractError::DuplicateCommitment {}),
+        None => (),
+    };
+
+    // Confirm root is ok
+    let commitment_mt = COMMITMENTS.load(deps.storage)?;
+    assert_ne!(
+        commitment_mt.current_root_index, 0,
+        "Commitment merkle tree shouldn't be 0"
+    );
+    if !commitment_mt.is_known_root(&Uint256::from_str(&root).unwrap()) {
+        return Err(ContractError::UnknownRoot {});
+    }
 
     // Verify SNARK
+    let verifier = VERIFIER.load(deps.storage)?;
+    let public_signals = PublicSignals(vec![
+        root.clone(),
+        nullifier_hash.clone(),
+        deposit_credential_hash.clone(),
+    ]);
+    let success = verifier.verify_proof(proof, &public_signals.get());
+    if !success {
+        return Err(ContractError::InvalidProof {});
+    }
 
     // Insert nullifier hash into map
-
+    NULLIFIER_HASHES.save(deps.storage, nullifier_hash, &true)?;
 
     // Add swap message with reply handler
     let input_denom = DEPOSIT_DENOM.load(deps.storage)?;
     let input_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
     let msg = get_osmosis_swap_msg(input_amount, input_denom, min_output, output_denom)?;
     let sub_msg = SubMsg::reply_on_success(msg, SWAP_DEPOSIT_REPLY_ID);
-    SWAP_DEPOSIT_CTX.save(deps.storage, &SwapDepositCtx {
-        // TODO: Add more fields
-        // This is to save the output of the swap into the contract state
-    })?;
+    SWAP_DEPOSIT_CTX.save(
+        deps.storage,
+        &SwapDepositCtx {
+            // This is to save the output of the swap into the contract state
+            deposit_credential_hash: deposit_credential_hash.clone(),
+        },
+    )?;
 
     Ok(Response::new()
         .add_submessage(sub_msg)
