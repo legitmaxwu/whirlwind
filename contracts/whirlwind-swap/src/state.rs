@@ -12,8 +12,8 @@ pub enum Denom {
 
 #[cw_serde]
 pub struct DenomOwnership {
-    amount: Uint128, 
-    denom: Denom
+    pub amount: Uint128, 
+    pub denom: Denom
 }
 
 pub const DEPOSIT_AMOUNT: Item<Uint128> = Item::new("deposit_amount");
@@ -26,3 +26,11 @@ pub const NULLIFIER_HASHES: Map<String, bool> = Map::new("nullifier_hashes");
 
 // Ownership hashes
 pub const OWNERSHIP_HASHES: Map<String, DenomOwnership> = Map::new("ownership_hashes");
+
+#[cw_serde]
+pub struct SwapDepositCtx {
+    
+}
+
+// Reply context
+pub const SWAP_DEPOSIT_CTX: Item<SwapDepositCtx> = Item::new("swap_deposit_ctx");

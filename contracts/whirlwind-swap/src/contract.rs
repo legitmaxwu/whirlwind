@@ -3,21 +3,23 @@ use std::str::FromStr;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Addr, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
-    Uint128, Uint256, WasmMsg,
+    to_binary, Addr, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply, Response,
+    StdResult, SubMsg, Uint128, Uint256, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg;
 
 use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{Denom, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM, VERIFIER};
+use crate::state::{Denom, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM, VERIFIER, SWAP_DEPOSIT_CTX, SwapDepositCtx};
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:whirlwind";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+const SWAP_DEPOSIT_REPLY_ID: u64 = 1;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -101,7 +103,6 @@ pub fn execute_deposit(
     }
     // TODO(max): Verify proof here
 
-
     // insert commitment into merkle tree
     let mut commitment_mt = COMMITMENTS.load(deps.storage)?;
     // confirm insert worked
@@ -122,8 +123,29 @@ pub fn execute_swap_deposit(
     deps: DepsMut,
     info: MessageInfo,
     output_denom: Denom,
+    min_output: Uint128,
 ) -> Result<Response, ContractError> {
-    unimplemented!()
+    // Reject if nullifier hash is in map
+
+    // Verify SNARK
+
+    // Insert nullifier hash into map
+
+
+    // Add swap message with reply handler
+    let input_denom = DEPOSIT_DENOM.load(deps.storage)?;
+    let input_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
+    let msg = get_osmosis_swap_msg(input_amount, input_denom, min_output, output_denom)?;
+    let sub_msg = SubMsg::reply_on_success(msg, SWAP_DEPOSIT_REPLY_ID);
+    SWAP_DEPOSIT_CTX.save(deps.storage, &SwapDepositCtx {
+        // TODO: Add more fields
+        // This is to save the output of the swap into the contract state
+    })?;
+
+    Ok(Response::new()
+        .add_submessage(sub_msg)
+        .add_attribute("action", "swap_deposit")
+        .add_attribute("from", info.sender))
 }
 
 pub fn execute_swap(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
@@ -139,7 +161,12 @@ pub fn get_osmosis_swap_msg(
     input_denom: Denom,
     min_output: Uint128,
     output_denom: Denom,
-) -> Result<Response, ContractError> {
+) -> Result<CosmosMsg, ContractError> {
+    unimplemented!()
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractError> {
     unimplemented!()
 }
 
