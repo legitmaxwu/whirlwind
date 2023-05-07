@@ -1,7 +1,7 @@
 [package]
 name = "whirlwind-swap"
 version = "0.1.0"
-authors = ["Bao <baomai@berkeley.edu>"]
+authors = ["Bao <baomai@berkeley.edu>", "Max Wu <chengmaxwu@gmail.com>"]
 edition = "2021"
 
 exclude = [
@@ -15,25 +15,11 @@ exclude = [
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[profile.release]
-opt-level = 3
-debug = false
-rpath = false
-lto = true
-debug-assertions = false
-codegen-units = 1
-panic = 'abort'
-incremental = false
-overflow-checks = true
-
 [features]
 # for more explicit tests, cargo test --features=backtraces
 backtraces = ["cosmwasm-std/backtraces"]
 # use library feature to disable all instantiate/execute/query exports
 library = []
-
-# Temporary solution to fix dependency tree hang in workspace Cargo.toml
-[workspace]
 
 [package.metadata.scripts]
 optimize = """docker run --rm -v "$(pwd)":/code \
@@ -47,10 +33,7 @@ cosmwasm-schema = "1.1.3"
 cosmwasm-std = "1.1.3"
 cosmwasm-storage = "1.1.3"
 cw-storage-plus = "1.0.1"
-cw2 = "1.0.1"
+cw2 = { workspace = true }
 schemars = "0.8.10"
 serde = { version = "1.0.145", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.31" }
-
-[dev-dependencies]
-cw-multi-test = "0.16.2"

@@ -1,15 +1,11 @@
-# [package]
-# name = "whirlwind"
-# version = "0.1.0"
-# authors = ["Max Wu <chengmaxwu@gmail.com>"]
-# edition = "2021"
-
 [workspace]
 members = [
     "contracts/cw-juicer",
-    # "contracts/whirlwind-swap",
+    "contracts/whirlwind-swap",
     "packages/*",
 ]
 
 [workspace.dependencies]
+cosmwasm-bignumber = "2.2.0"
+cw2 = "1.0.1"
 lib = { path = "./packages/lib" }
