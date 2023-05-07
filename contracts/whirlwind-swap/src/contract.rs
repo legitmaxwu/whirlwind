@@ -1,6 +1,6 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
+use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint256, Uint128};
 use cw2::set_contract_version;
 
 use crate::error::ContractError;
@@ -58,7 +58,7 @@ pub fn execute_deposit(
 
     let mut commitment_mt = COMMITMENTS.load(deps.storage)?;
     // confirm insert worked
-    let success = commitment_mt.insert(&U256::from_str(&commitment)?); 
+    let success = commitment_mt.insert(&Uint256::from_str(&commitment)?); 
     if success.is_none() {
         return Err(ContractError::InsertFailed {});
     }
@@ -96,7 +96,7 @@ pub fn get_osmosis_swap_msg(
     input_denom: Denom,
     min_output: Uint128,
     output_denom: Denom
-) -> StdResult {
+) -> Result<Response, ContractError> {
     unimplemented!()
 }
 

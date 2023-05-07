@@ -1,11 +1,12 @@
-use cw_storage_plus::{Item, Map, Addr};
+use cw_storage_plus::{Item, Map};
+use cosmwasm_std::{Uint128, Addr};
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
-use cw_serde::cw_serde;
+use cosmwasm_schema::{cw_serde};
 
 #[cw_serde]
 pub enum Denom {
-    Native(String)
+    Native(String),
     Cw20(Addr)
 }
 

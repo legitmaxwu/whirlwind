@@ -1,25 +1,26 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
+use cosmwasm_std::{Uint128};
 
 #[cw_serde]
-pub struct DenomUnvalidated {
-    Native(String)
+pub enum DenomUnvalidated {
+    Native(String),
     Cw20(String)
 }
 
 #[cw_serde]
 pub struct InstantiateMsg {
-    amount: Uint128, 
-    denom: DenomUnvalidated
+    pub amount: Uint128, 
+    pub denom: DenomUnvalidated
 }
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    Deposit {}
-    SwapDeposit {}
+    Deposit {},
+    SwapDeposit {},
     Swap {
         input_amount: Uint128,
         output_denom: DenomUnvalidated
-    }  
+    },
     Withdraw {}
 }
 
