@@ -5,8 +5,8 @@ use ark_groth16::Proof;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Addr, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError,
-    StdResult, SubMsg, Uint128, Uint256, WasmMsg,
+    to_binary, Addr, BankMsg, Binary, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply,
+    Response, StdError, StdResult, SubMsg, Uint128, Uint256, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg;
@@ -16,7 +16,8 @@ use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{
     Denom, DenomOwnership, SwapContext, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
-    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_VERIFIER, VERIFIER, SWAP_DEPOSIT_VERIFIER,
+    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_DEPOSIT_VERIFIER, SWAP_VERIFIER, VERIFIER,
+    WITHDRAW_VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
@@ -241,8 +242,61 @@ pub fn execute_swap(
         .add_attribute("from", info.sender))
 }
 
-pub fn execute_withdraw(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
-    unimplemented!()
+pub fn execute_withdraw(
+    deps: DepsMut,
+    info: MessageInfo,
+
+    proof: Proof<Bn254>,
+    withdraw_addr: Addr,
+    deposit_credential_hash: String,
+) -> Result<Response, ContractError> {
+    // Confirm deposit credential hash is in map
+    let (ownership, _) = OWNERSHIP_HASHES
+        .load(deps.storage, deposit_credential_hash.clone())
+        .map_err(|_| ContractError::InvalidDepositCredential {})?;
+
+    // Verify SNARK
+    let verifier = WITHDRAW_VERIFIER.load(deps.storage)?;
+    let public_signals = PublicSignals(vec![
+        withdraw_addr.to_string(),
+        deposit_credential_hash.clone(),
+    ]);
+    let success = verifier.verify_proof(proof, &public_signals.get());
+    if !success {
+        return Err(ContractError::InvalidProof {});
+    }
+
+    // Remove old deposit credential hash from map
+    OWNERSHIP_HASHES.remove(deps.storage, deposit_credential_hash.clone());
+
+    // Send funds to withdraw address
+    let mut msgs: Vec<CosmosMsg> = vec![];
+    match ownership.denom {
+        Denom::Native(denom) => {
+            msgs.push(CosmosMsg::Bank(BankMsg::Send {
+                to_address: withdraw_addr.to_string(),
+                amount: vec![Coin {
+                    amount: ownership.amount,
+                    denom,
+                }],
+            }));
+        }
+        Denom::Cw20(addr) => {
+            msgs.push(CosmosMsg::Wasm(WasmMsg::Execute {
+                contract_addr: addr.to_string(),
+                msg: to_binary(&Cw20ExecuteMsg::Transfer {
+                    recipient: withdraw_addr.to_string(),
+                    amount: ownership.amount,
+                })?,
+                funds: vec![],
+            }));
+        }
+    }
+
+    Ok(Response::default()
+        .add_messages(msgs)
+        .add_attribute("action", "withdraw")
+        .add_attribute("from", info.sender))
 }
 
 pub fn get_osmosis_swap_msg(
