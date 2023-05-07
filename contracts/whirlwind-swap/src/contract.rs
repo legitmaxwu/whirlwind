@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint256, Uint128};
@@ -6,6 +8,8 @@ use cw2::set_contract_version;
 use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{Denom, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM, VERIFIER};
+use lib::merkle_tree::MerkleTreeWithHistory;
+use lib::verifier::Verifier;
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:whirlwind";
@@ -60,7 +64,7 @@ pub fn execute_deposit(
     // confirm insert worked
     let success = commitment_mt.insert(&Uint256::from_str(&commitment)?); 
     if success.is_none() {
-        return Err(ContractError::InsertFailed {});
+        return Err(ContractError::InvalidCommitment {  });
     }
 
     COMMITMENTS.save(deps.storage, &commitment_mt)?;
