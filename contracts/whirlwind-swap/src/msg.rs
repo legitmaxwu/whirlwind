@@ -10,7 +10,12 @@ pub enum DenomUnvalidated {
 #[cw_serde]
 pub struct InstantiateMsg {
     pub amount: Uint128, 
-    pub denom: DenomUnvalidated
+    pub denom: DenomUnvalidated,
+
+    pub vk_deposit: String,
+    pub vk_swap_deposit: String,
+    pub vk_swap: String,
+    pub vk_withdraw: String
 }
 
 #[cw_serde]

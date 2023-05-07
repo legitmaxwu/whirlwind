@@ -16,7 +16,7 @@ use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{
     Denom, DenomOwnership, SwapContext, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
-    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_DEPOSIT_VERIFIER, SWAP_VERIFIER, VERIFIER,
+    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_DEPOSIT_VERIFIER, SWAP_VERIFIER, DEPOSIT_VERIFIER,
     WITHDRAW_VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
@@ -45,7 +45,7 @@ pub fn instantiate(
     DEPOSIT_AMOUNT.save(deps.storage, &msg.amount)?;
 
     let verifier = Verifier::new();
-    VERIFIER.save(deps.storage, &verifier)?;
+    DEPOSIT_VERIFIER.save(deps.storage, &verifier)?;
 
     let tree = MerkleTreeWithHistory::new(20);
     COMMITMENTS.save(deps.storage, &tree)?;

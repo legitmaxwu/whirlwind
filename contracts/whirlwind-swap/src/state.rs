@@ -20,7 +20,7 @@ pub const DEPOSIT_AMOUNT: Item<Uint128> = Item::new("deposit_amount");
 pub const DEPOSIT_DENOM: Item<Denom> = Item::new("deposit_denom");
 
 // Verifiers
-pub const VERIFIER: Item<Verifier> = Item::new("verifier");
+pub const DEPOSIT_VERIFIER: Item<Verifier> = Item::new("verifier");
 pub const SWAP_DEPOSIT_VERIFIER: Item<Verifier> = Item::new("swap_deposit_verifier");
 pub const SWAP_VERIFIER: Item<Verifier> = Item::new("swap_verifier");
 pub const WITHDRAW_VERIFIER: Item<Verifier> = Item::new("withdraw_verifier");
