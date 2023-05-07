@@ -348,6 +348,9 @@ pub fn get_osmosis_swap_msg(
             msg: "Not yet supported".into(),
         })),
     }?;
+    // TODO(!): Verify every pool id in routes is in allowed pools 
+
+    // TODO(!): Verify that output denom is last element of routes
     let output_denom = match output_denom {
         Denom::Native(denom) => Ok(denom),
         Denom::Cw20(_) => Err(ContractError::Std(StdError::GenericErr {
