@@ -44,8 +44,16 @@ pub fn instantiate(
     DEPOSIT_DENOM.save(deps.storage, &denom)?;
     DEPOSIT_AMOUNT.save(deps.storage, &msg.amount)?;
 
-    let verifier = Verifier::new();
-    DEPOSIT_VERIFIER.save(deps.storage, &verifier)?;
+    // Instantiate verifiers
+    let deposit_v = Verifier::from_vk(msg.vk_deposit);
+    let swap_deposit_v = Verifier::from_vk(msg.vk_swap_deposit);
+    let swap_v = Verifier::from_vk(msg.vk_swap);
+    let withdraw_v = Verifier::from_vk(msg.vk_withdraw);
+
+    DEPOSIT_VERIFIER.save(deps.storage, &deposit_v)?;  
+    SWAP_DEPOSIT_VERIFIER.save(deps.storage, &swap_deposit_v)?;
+    SWAP_VERIFIER.save(deps.storage, &swap_v)?;
+    WITHDRAW_VERIFIER.save(deps.storage, &withdraw_v)?;
 
     let tree = MerkleTreeWithHistory::new(20);
     COMMITMENTS.save(deps.storage, &tree)?;
