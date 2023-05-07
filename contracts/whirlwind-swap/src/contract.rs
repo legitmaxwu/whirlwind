@@ -204,7 +204,9 @@ pub fn execute_swap_deposit(
     // Add swap message with reply handler
     let input_denom = DEPOSIT_DENOM.load(deps.storage)?;
     let input_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
+    let allowed_pool_ids = ALLOWED_POOLS.load(deps.storage)?;
     let msg = get_osmosis_swap_msg(
+        allowed_pool_ids,
         env.contract.address.clone(),
         routes,
         input_amount,
@@ -265,7 +267,9 @@ pub fn execute_swap(
     OWNERSHIP_HASHES.remove(deps.storage, deposit_credential_hash.clone());
 
     // Add swap message with reply handler
+    let allowed_pool_ids = ALLOWED_POOLS.load(deps.storage)?;
     let msg = get_osmosis_swap_msg(
+        allowed_pool_ids,
         env.contract.address.clone(),
         routes,
         ownership.amount,
@@ -368,6 +372,7 @@ pub fn execute_update_allowed_pools(
 }
 
 pub fn get_osmosis_swap_msg(
+    allowed_pool_ids: Vec<String>,
     contract_addr: Addr,
     routes: Vec<OsmosisRoute>,
     input_amount: Uint128,
@@ -381,15 +386,25 @@ pub fn get_osmosis_swap_msg(
             msg: "Not yet supported".into(),
         })),
     }?;
-    // TODO(!): Verify every pool id in routes is in allowed pools
-
-    // TODO(!): Verify that output denom is last element of routes
     let output_denom = match output_denom {
         Denom::Native(denom) => Ok(denom),
         Denom::Cw20(_) => Err(ContractError::Std(StdError::GenericErr {
             msg: "Not yet supported".into(),
         })),
     }?;
+    for (i, route) in routes.iter().enumerate() {
+        if !allowed_pool_ids.contains(&route.pool_id.clone()) {
+            return Err(ContractError::InvalidPoolId {
+                id: route.pool_id.clone(),
+            });
+        }
+        // Quite important to check that the output denom is the last element 
+        if (i == routes.len() - 1) && (route.token_out_denom != output_denom) {
+            return Err(ContractError::Std(StdError::GenericErr {
+                msg: "Output denom must be last element of routes".into(),
+            }));
+        }
+    }
     let msg = CosmosMsg::Custom(OsmosisSwap {
         _type: "osmosis/gamm/swap-exact-amount-in".into(),
         value: OsmosisSwapValue {
@@ -416,7 +431,7 @@ pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractEr
                 counter,
             } = SWAP_CTX.load(deps.storage)?;
 
-            // Output of Osmosis swap is the difference between 
+            // Output of Osmosis swap is the difference between
             // the output denom balance before and after swap
             let output_balance_after_swap =
                 get_denom_balance(deps.as_ref(), output_denom.clone(), env.contract.address)?;
