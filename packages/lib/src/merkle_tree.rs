@@ -113,6 +113,54 @@ impl MerkleTreeWithHistory {
         Some(self.next_index - 1)
     }
 
+    pub fn insert_and_return_path(&mut self, leaf: &U256) -> Option<(u32, Vec<U256>, Vec<U256>)> {
+        let mut idx = self.next_index;
+        if idx == 2_u32.saturating_pow(self.levels) {
+            //"Merkle tree is full. No more leafs can be added");
+            return None;
+        }
+
+        self.next_index += 1;
+        let mut current_level_hash: U256 = *leaf;
+        let mut left: &U256;
+        let mut right: &U256;
+
+        let mut path_indices = Vec::new();
+        let mut path_elements = Vec::new();
+
+        for i in 0..(self.levels) {
+            if idx % 2 == 0 {
+
+                left = &current_level_hash;
+                right = &self.zeros[i as usize];
+
+
+                path_indices.push(U256::zero());
+                path_elements.push(right.clone());
+
+
+                self.filled_subtrees[i as usize] = current_level_hash;
+            } else {
+
+                left = &self.filled_subtrees[i as usize];
+                right = &current_level_hash;
+
+                path_indices.push(U256::one());
+                path_elements.push(left.clone());
+            }
+
+            current_level_hash = self.hash_left_right(left, right);
+
+
+            idx /= 2;
+        }
+
+        self.current_root_index = (self.current_root_index + 1) % ROOT_HISTORY_SIZE;
+        self.roots[self.current_root_index as usize] = current_level_hash;
+
+        Some((self.next_index - 1, path_indices, path_elements))
+    }
+
     pub fn is_known_root(&self, root: &U256) -> bool {
         if root == &U256::zero() {
             return false;

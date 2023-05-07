@@ -18,6 +18,7 @@ template Deposit() {
   log("secret", secret);
   log("depositCredentialHasher.out", depositCredentialHasher.out);
   log("depositCredential", depositCredential);
+  
   depositCredential === depositCredentialHasher.out;
 }
 

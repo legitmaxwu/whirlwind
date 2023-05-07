@@ -340,19 +340,19 @@ impl<F: PrimeField> FieldHasher<F> for Poseidon<F> {
 				.collect();
 
 			// Make state readable by turning into array of bigints
-			for s in state.clone() {
-				// Convert s into uint256 and then add to state_bytes
-				let mut s_bytes: Result<Vec<u8>, Box<Error>> = Ok(s.into_repr().to_bytes_le());
-				// Append s_bytes to state_bytes
-				let s_bytes_2 = s_bytes.map(|h| {
-                    let mut hash_result = [0u8; 32];
-                    hash_result.copy_from_slice(&h);
-                    hash_result
-                }).unwrap();
-				let str = Uint256::from_le_bytes(s_bytes_2).to_string();
-				println!("str: {}", str);
-			}
-			println!("\n\n");
+			// for s in state.clone() {
+			// 	// Convert s into uint256 and then add to state_bytes
+			// 	let mut s_bytes: Result<Vec<u8>, Box<Error>> = Ok(s.into_repr().to_bytes_le());
+			// 	// Append s_bytes to state_bytes
+			// 	let s_bytes_2 = s_bytes.map(|h| {
+            //         let mut hash_result = [0u8; 32];
+            //         hash_result.copy_from_slice(&h);
+            //         hash_result
+            //     }).unwrap();
+			// 	let str = Uint256::from_le_bytes(s_bytes_2).to_string();
+			// 	println!("str: {}", str);
+			// }
+			// println!("\n\n");
 		}
 
 
