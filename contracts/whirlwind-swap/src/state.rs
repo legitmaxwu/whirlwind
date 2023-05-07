@@ -29,7 +29,8 @@ pub const OWNERSHIP_HASHES: Map<String, DenomOwnership> = Map::new("ownership_ha
 
 #[cw_serde]
 pub struct SwapDepositCtx {
-    pub deposit_credential_hash: String 
+    pub deposit_credential_hash: String,
+    pub output_denom: Denom
 }
 
 // Reply context

@@ -5,7 +5,7 @@ use ark_groth16::Proof;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Addr, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply, Response,
+    to_binary, Addr, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError,
     StdResult, SubMsg, Uint128, Uint256, WasmMsg,
 };
 use cw2::set_contract_version;
@@ -15,8 +15,8 @@ use lib::msg::PublicSignals;
 use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{
-    Denom, SwapDepositCtx, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM, NULLIFIER_HASHES,
-    SWAP_DEPOSIT_CTX, VERIFIER,
+    Denom, DenomOwnership, SwapDepositCtx, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
+    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_DEPOSIT_CTX, VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
@@ -169,13 +169,14 @@ pub fn execute_swap_deposit(
     // Add swap message with reply handler
     let input_denom = DEPOSIT_DENOM.load(deps.storage)?;
     let input_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
-    let msg = get_osmosis_swap_msg(input_amount, input_denom, min_output, output_denom)?;
+    let msg = get_osmosis_swap_msg(input_amount, input_denom, min_output, output_denom.clone())?;
     let sub_msg = SubMsg::reply_on_success(msg, SWAP_DEPOSIT_REPLY_ID);
     SWAP_DEPOSIT_CTX.save(
         deps.storage,
         &SwapDepositCtx {
             // This is to save the output of the swap into the contract state
             deposit_credential_hash: deposit_credential_hash.clone(),
+            output_denom,
         },
     )?;
 
@@ -204,7 +205,31 @@ pub fn get_osmosis_swap_msg(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractError> {
-    unimplemented!()
+    match msg.id {
+        SWAP_DEPOSIT_REPLY_ID => {
+            let SwapDepositCtx {
+                deposit_credential_hash,
+                output_denom,
+            } = SWAP_DEPOSIT_CTX.load(deps.storage)?;
+
+            // TODO(!): Get output of Osmosis transaction
+            // from transaction success
+
+            OWNERSHIP_HASHES.save(
+                deps.storage,
+                deposit_credential_hash,
+                &DenomOwnership {
+                    // TODO(!): Get output amount from Osmosis transaction
+                    amount: Uint128::zero(),
+                    denom: output_denom,
+                },
+            )?;
+            Ok(Response::default())
+        }
+        _ => Err(ContractError::Std(StdError::GenericErr {
+            msg: "Unknown reply ID".to_string(),
+        })),
+    }
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
