@@ -15,8 +15,8 @@ use lib::msg::PublicSignals;
 use crate::error::ContractError;
 use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{
-    Denom, DenomOwnership, SwapDepositCtx, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
-    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_DEPOSIT_CTX, VERIFIER,
+    Denom, DenomOwnership, SwapContext, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
+    NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_VERIFIER, VERIFIER, SWAP_DEPOSIT_VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
@@ -25,7 +25,7 @@ use lib::verifier::Verifier;
 const CONTRACT_NAME: &str = "crates.io:whirlwind";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-const SWAP_DEPOSIT_REPLY_ID: u64 = 1;
+const SWAP_REPLY_ID: u64 = 1;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -152,7 +152,7 @@ pub fn execute_swap_deposit(
     }
 
     // Verify SNARK
-    let verifier = VERIFIER.load(deps.storage)?;
+    let verifier = SWAP_DEPOSIT_VERIFIER.load(deps.storage)?;
     let public_signals = PublicSignals(vec![
         root.clone(),
         nullifier_hash.clone(),
@@ -170,13 +170,16 @@ pub fn execute_swap_deposit(
     let input_denom = DEPOSIT_DENOM.load(deps.storage)?;
     let input_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
     let msg = get_osmosis_swap_msg(input_amount, input_denom, min_output, output_denom.clone())?;
-    let sub_msg = SubMsg::reply_on_success(msg, SWAP_DEPOSIT_REPLY_ID);
-    SWAP_DEPOSIT_CTX.save(
+    let sub_msg = SubMsg::reply_on_success(msg, SWAP_REPLY_ID);
+    SWAP_CTX.save(
         deps.storage,
-        &SwapDepositCtx {
+        &SwapContext {
             // This is to save the output of the swap into the contract state
             deposit_credential_hash: deposit_credential_hash.clone(),
             output_denom,
+            // This number is the first `n + 1` due to swap deposit
+            // See design document for more details.
+            counter: 3,
         },
     )?;
 
@@ -186,8 +189,56 @@ pub fn execute_swap_deposit(
         .add_attribute("from", info.sender))
 }
 
-pub fn execute_swap(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
-    unimplemented!()
+pub fn execute_swap(
+    deps: DepsMut,
+    info: MessageInfo,
+    proof: Proof<Bn254>,
+    deposit_credential_hash: String,
+    new_deposit_credential_hash: String,
+    min_output: Uint128,
+    output_denom: Denom,
+) -> Result<Response, ContractError> {
+    // Confirm deposit credential hash is in map
+    let (ownership, counter) = OWNERSHIP_HASHES
+        .load(deps.storage, deposit_credential_hash.clone())
+        .map_err(|_| ContractError::InvalidDepositCredential {})?;
+
+    // Verify SNARK
+    let verifier = SWAP_VERIFIER.load(deps.storage)?;
+    let public_signals = PublicSignals(vec![
+        deposit_credential_hash.clone(),
+        new_deposit_credential_hash.clone(),
+    ]);
+    let success = verifier.verify_proof(proof, &public_signals.get());
+    if !success {
+        return Err(ContractError::InvalidProof {});
+    }
+
+    // Remove old deposit credential hash from map
+    OWNERSHIP_HASHES.remove(deps.storage, deposit_credential_hash.clone());
+
+    // Add swap message with reply handler
+    let msg = get_osmosis_swap_msg(
+        ownership.amount,
+        ownership.denom,
+        min_output,
+        output_denom.clone(),
+    )?;
+    let sub_msg = SubMsg::reply_on_success(msg, SWAP_REPLY_ID);
+    SWAP_CTX.save(
+        deps.storage,
+        &SwapContext {
+            // This is to save the output of the swap into the contract state
+            deposit_credential_hash: new_deposit_credential_hash.clone(),
+            output_denom,
+            counter: counter + 1,
+        },
+    )?;
+
+    Ok(Response::new()
+        .add_submessage(sub_msg)
+        .add_attribute("action", "swap")
+        .add_attribute("from", info.sender))
 }
 
 pub fn execute_withdraw(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
@@ -206,11 +257,12 @@ pub fn get_osmosis_swap_msg(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractError> {
     match msg.id {
-        SWAP_DEPOSIT_REPLY_ID => {
-            let SwapDepositCtx {
+        SWAP_REPLY_ID => {
+            let SwapContext {
                 deposit_credential_hash,
                 output_denom,
-            } = SWAP_DEPOSIT_CTX.load(deps.storage)?;
+                counter,
+            } = SWAP_CTX.load(deps.storage)?;
 
             // TODO(!): Get output of Osmosis transaction
             // from transaction success
@@ -218,11 +270,14 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractE
             OWNERSHIP_HASHES.save(
                 deps.storage,
                 deposit_credential_hash,
-                &DenomOwnership {
-                    // TODO(!): Get output amount from Osmosis transaction
-                    amount: Uint128::zero(),
-                    denom: output_denom,
-                },
+                &(
+                    DenomOwnership {
+                        // TODO(!): Get output amount from Osmosis transaction
+                        amount: Uint128::zero(),
+                        denom: output_denom,
+                    },
+                    counter,
+                ),
             )?;
             Ok(Response::default())
         }

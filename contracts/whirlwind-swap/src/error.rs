@@ -25,4 +25,7 @@ pub enum ContractError {
 
     #[error("Invalid proof")]
     InvalidProof {},
+
+    #[error("Invalid deposit credential")]
+    InvalidDepositCredential {},
 }

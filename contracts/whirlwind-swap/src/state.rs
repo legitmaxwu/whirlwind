@@ -18,20 +18,25 @@ pub struct DenomOwnership {
 
 pub const DEPOSIT_AMOUNT: Item<Uint128> = Item::new("deposit_amount");
 pub const DEPOSIT_DENOM: Item<Denom> = Item::new("deposit_denom");
+
 pub const VERIFIER: Item<Verifier> = Item::new("verifier");
+
+pub const SWAP_DEPOSIT_VERIFIER: Item<Verifier> = Item::new("swap_deposit_verifier");
+pub const SWAP_VERIFIER: Item<Verifier> = Item::new("swap_verifier");
 
 // Deposit
 pub const COMMITMENTS: Item<MerkleTreeWithHistory> = Item::new("commitments");
 pub const NULLIFIER_HASHES: Map<String, bool> = Map::new("nullifier_hashes");
 
 // Ownership hashes
-pub const OWNERSHIP_HASHES: Map<String, DenomOwnership> = Map::new("ownership_hashes");
+pub const OWNERSHIP_HASHES: Map<String, (DenomOwnership, u32)> = Map::new("ownership_hashes");
 
 #[cw_serde]
-pub struct SwapDepositCtx {
+pub struct SwapContext {
     pub deposit_credential_hash: String,
-    pub output_denom: Denom
+    pub output_denom: Denom,
+    pub counter: u32
 }
 
 // Reply context
-pub const SWAP_DEPOSIT_CTX: Item<SwapDepositCtx> = Item::new("swap_deposit_ctx");
+pub const SWAP_CTX: Item<SwapContext> = Item::new("swap_ctx");
