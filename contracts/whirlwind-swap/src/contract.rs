@@ -2,7 +2,10 @@ use std::str::FromStr;
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint256, Uint128, CosmosMsg, WasmMsg, to_binary};
+use cosmwasm_std::{
+    to_binary, Addr, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
+    Uint128, Uint256, WasmMsg,
+};
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg;
 
@@ -43,19 +46,31 @@ pub fn instantiate(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
-    _deps: DepsMut,
-    _env: Env,
-    _info: MessageInfo,
-    _msg: ExecuteMsg,
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
-    unimplemented!()
+    match msg {
+        ExecuteMsg::Deposit {
+            proof,
+            deposit_credential,
+            withdraw_addr,
+        } => {
+            let withdraw_addr = deps.api.addr_validate(&withdraw_addr)?;
+            execute_deposit(deps, info, env, proof, deposit_credential, withdraw_addr)
+        }
+        _ => unimplemented!(),
+    }
 }
 
 pub fn execute_deposit(
     deps: DepsMut,
     info: MessageInfo,
     env: Env,
-    commitment: String 
+    proof: String,
+    deposit_credential: String,
+    withdraw_addr: Addr,
 ) -> Result<Response, ContractError> {
     // confirm deposit amount and denom
     let deposit_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
@@ -64,15 +79,15 @@ pub fn execute_deposit(
     match deposit_denom {
         Denom::Native(denom) => {
             if info.funds.len() != 1 {
-                return Err(ContractError::InvalidDeposit {  });
+                return Err(ContractError::InvalidDeposit {});
             }
             if info.funds[0].amount != deposit_amount {
-                return Err(ContractError::InvalidDeposit {  });
+                return Err(ContractError::InvalidDeposit {});
             }
             if info.funds[0].denom != denom {
-                return Err(ContractError::InvalidDeposit {  });
+                return Err(ContractError::InvalidDeposit {});
             }
-        },
+        }
         Denom::Cw20(addr) => {
             msgs.push(CosmosMsg::Wasm(WasmMsg::Execute {
                 contract_addr: addr.to_string(),
@@ -84,12 +99,15 @@ pub fn execute_deposit(
             }));
         }
     }
+    // TODO(max): Verify proof here
 
+
+    // insert commitment into merkle tree
     let mut commitment_mt = COMMITMENTS.load(deps.storage)?;
     // confirm insert worked
-    let success = commitment_mt.insert(&Uint256::from_str(&commitment)?); 
+    let success = commitment_mt.insert(&Uint256::from_str(&deposit_credential)?);
     if success.is_none() {
-        return Err(ContractError::InvalidCommitment {  });
+        return Err(ContractError::InvalidCommitment {});
     }
 
     COMMITMENTS.save(deps.storage, &commitment_mt)?;
@@ -101,24 +119,18 @@ pub fn execute_deposit(
 }
 
 pub fn execute_swap_deposit(
-    deps: DepsMut, 
-    info: MessageInfo
-) -> Result<Response, ContractError> {
-
-    unimplemented!()
-}
-
-pub fn execute_swap(
-    deps: DepsMut, 
-    info: MessageInfo
+    deps: DepsMut,
+    info: MessageInfo,
+    output_denom: Denom,
 ) -> Result<Response, ContractError> {
     unimplemented!()
 }
 
-pub fn execute_withdraw(
-    deps: DepsMut, 
-    info: MessageInfo
-) -> Result<Response, ContractError> {
+pub fn execute_swap(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
+    unimplemented!()
+}
+
+pub fn execute_withdraw(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
     unimplemented!()
 }
 
@@ -126,7 +138,7 @@ pub fn get_osmosis_swap_msg(
     input_amount: Uint128,
     input_denom: Denom,
     min_output: Uint128,
-    output_denom: Denom
+    output_denom: Denom,
 ) -> Result<Response, ContractError> {
     unimplemented!()
 }

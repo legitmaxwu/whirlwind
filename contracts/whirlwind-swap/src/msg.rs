@@ -15,7 +15,11 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    Deposit {},
+    Deposit {
+        proof: String,
+        deposit_credential: String,
+        withdraw_addr: String    
+    },
     SwapDeposit {},
     Swap {
         input_amount: Uint128,
