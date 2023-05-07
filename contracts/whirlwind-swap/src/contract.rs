@@ -13,7 +13,10 @@ use cw20::Cw20ExecuteMsg;
 use lib::msg::PublicSignals;
 
 use crate::error::ContractError;
-use crate::msg::{DenomUnvalidated, ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{
+    DenomUnvalidated, ExecuteMsg, InstantiateMsg, OsmosisRoute, OsmosisSwap, OsmosisSwapValue,
+    QueryMsg,
+};
 use crate::state::{
     Denom, DenomOwnership, SwapContext, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
     DEPOSIT_VERIFIER, NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_DEPOSIT_VERIFIER,
@@ -148,13 +151,15 @@ pub fn execute_deposit(
 pub fn execute_swap_deposit(
     deps: DepsMut,
     info: MessageInfo,
+    env: Env,
     proof: Proof<Bn254>,
     root: String,
     nullifier_hash: String,
     new_deposit_credential_hash: String,
+    routes: Vec<OsmosisRoute>,
     min_output: Uint128,
     output_denom: Denom,
-) -> Result<Response, ContractError> {
+) -> Result<Response<OsmosisSwap>, ContractError> {
     // Reject if nullifier hash is in map
     match NULLIFIER_HASHES.may_load(deps.storage, nullifier_hash.clone())? {
         Some(_) => return Err(ContractError::DuplicateCommitment {}),
@@ -189,7 +194,14 @@ pub fn execute_swap_deposit(
     // Add swap message with reply handler
     let input_denom = DEPOSIT_DENOM.load(deps.storage)?;
     let input_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
-    let msg = get_osmosis_swap_msg(input_amount, input_denom, min_output, output_denom.clone())?;
+    let msg = get_osmosis_swap_msg(
+        env.contract.address,
+        routes,
+        input_amount,
+        input_denom,
+        min_output,
+        output_denom.clone(),
+    )?;
     let sub_msg = SubMsg::reply_on_success(msg, SWAP_REPLY_ID);
     SWAP_CTX.save(
         deps.storage,
@@ -212,12 +224,14 @@ pub fn execute_swap_deposit(
 pub fn execute_swap(
     deps: DepsMut,
     info: MessageInfo,
+    env: Env,
     proof: Proof<Bn254>,
     deposit_credential_hash: String,
     new_deposit_credential_hash: String,
+    routes: Vec<OsmosisRoute>,
     min_output: Uint128,
     output_denom: Denom,
-) -> Result<Response, ContractError> {
+) -> Result<Response<OsmosisSwap>, ContractError> {
     // Confirm deposit credential hash is in map
     let (ownership, counter) = OWNERSHIP_HASHES
         .load(deps.storage, deposit_credential_hash.clone())
@@ -239,6 +253,8 @@ pub fn execute_swap(
 
     // Add swap message with reply handler
     let msg = get_osmosis_swap_msg(
+        env.contract.address,
+        routes,
         ownership.amount,
         ownership.denom,
         min_output,
@@ -319,12 +335,38 @@ pub fn execute_withdraw(
 }
 
 pub fn get_osmosis_swap_msg(
+    contract_addr: Addr,
+    routes: Vec<OsmosisRoute>,
     input_amount: Uint128,
     input_denom: Denom,
     min_output: Uint128,
     output_denom: Denom,
-) -> Result<CosmosMsg, ContractError> {
-    unimplemented!()
+) -> Result<CosmosMsg<OsmosisSwap>, ContractError> {
+    let input_denom = match input_denom {
+        Denom::Native(denom) => Ok(denom),
+        Denom::Cw20(_) => Err(ContractError::Std(StdError::GenericErr {
+            msg: "Not yet supported".into(),
+        })),
+    }?;
+    let output_denom = match output_denom {
+        Denom::Native(denom) => Ok(denom),
+        Denom::Cw20(_) => Err(ContractError::Std(StdError::GenericErr {
+            msg: "Not yet supported".into(),
+        })),
+    }?;
+    let msg = CosmosMsg::Custom(OsmosisSwap {
+        _type: "osmosis/gamm/swap-exact-amount-in".into(),
+        value: OsmosisSwapValue {
+            routes,
+            sender: contract_addr.into(),
+            token_in: Coin {
+                denom: input_denom,
+                amount: input_amount,
+            },
+            token_out_min_amount: min_output,
+        },
+    });
+    Ok(msg)
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::Uint128;
+use cosmwasm_std::{Uint128, Coin};
 
 use crate::state::Denom;
 
@@ -27,12 +27,17 @@ pub enum ExecuteMsg {
         deposit_credential: String,
         withdraw_addr: String,
     },
-    SwapDeposit {},
+    SwapDeposit {
+    },
     Swap {
+        routes: Vec<OsmosisRoute>,
         input_amount: Uint128,
         output_denom: DenomUnvalidated,
     },
     Withdraw {},
+    UpdateAllowedPools {
+        pools: Vec<String>,
+    }
 }
 
 #[cw_serde]
@@ -48,4 +53,28 @@ pub enum QueryMsg {
     // Get ownership and counter
     #[returns(OwnershipResponse)]
     GetOwnership { deposit_credential_hash: String },
+}
+
+
+// MARK: Osmosis Messages
+
+#[cw_serde]
+pub struct OsmosisRoute {
+    pub pool_id: String,
+    pub token_out_denom: String,
+}
+
+#[cw_serde]
+pub struct OsmosisSwapValue {
+    pub routes: Vec<OsmosisRoute>,
+    pub sender: String,
+    pub token_in: Coin,
+    pub token_out_min_amount: Uint128, 
+}
+
+#[cw_serde]
+pub struct OsmosisSwap {
+    #[serde(rename = "type")]
+    pub _type: String,
+    pub value: OsmosisSwapValue, 
 }
