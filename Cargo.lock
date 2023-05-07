@@ -138,7 +138,6 @@ dependencies = [
  "blake2 0.9.2",
  "derivative",
  "digest 0.9.0",
- "rayon",
  "tracing",
 ]
 
@@ -172,7 +171,6 @@ dependencies = [
  "ark-std 0.3.0",
  "derivative",
  "num-traits",
- "rayon",
  "zeroize",
 ]
 
@@ -195,32 +193,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ark-ed-on-bls12-381"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43b7ada17db3854f5994e74e60b18e10e818594935ee7e1d329800c117b32970"
-dependencies = [
- "ark-bls12-381",
- "ark-ec 0.3.0",
- "ark-ff 0.3.0",
- "ark-r1cs-std",
- "ark-std 0.3.0",
-]
-
-[[package]]
-name = "ark-ed-on-bn254"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fdc786b806fdbff4abebb08ec2fcb50cfe3941918e57120ab121228452903fd"
-dependencies = [
- "ark-bn254 0.3.0",
- "ark-ec 0.3.0",
- "ark-ff 0.3.0",
- "ark-r1cs-std",
- "ark-std 0.3.0",
-]
-
-[[package]]
 name = "ark-ff"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -234,7 +206,6 @@ dependencies = [
  "num-bigint",
  "num-traits",
  "paste",
- "rayon",
  "rustc_version 0.3.3",
  "zeroize",
 ]
@@ -406,7 +377,6 @@ dependencies = [
  "ark-ff 0.3.0",
  "ark-std 0.3.0",
  "tracing",
- "tracing-subscriber 0.2.25",
 ]
 
 [[package]]
@@ -497,7 +467,6 @@ checksum = "1df2c09229cbc5a028b1d70e00fdb2acee28b1055dfb5ca73eea49c5a25c4e7c"
 dependencies = [
  "num-traits",
  "rand",
- "rayon",
 ]
 
 [[package]]
@@ -509,19 +478,6 @@ dependencies = [
  "num-traits",
  "rand",
  "rayon",
-]
-
-[[package]]
-name = "arkworks-native-gadgets"
-version = "0.5.3"
-dependencies = [
- "ark-bn254 0.3.0",
- "ark-crypto-primitives 0.3.0",
- "ark-ed-on-bls12-381",
- "ark-ed-on-bn254",
- "ark-ff 0.3.0",
- "ark-std 0.3.0",
- "cosmwasm-std",
 ]
 
 [[package]]
@@ -545,7 +501,7 @@ dependencies = [
  "ark-r1cs-std",
  "ark-relations 0.3.0",
  "ark-std 0.3.0",
- "arkworks-native-gadgets 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "arkworks-native-gadgets",
  "arkworks-r1cs-gadgets",
 ]
 
@@ -560,7 +516,7 @@ dependencies = [
  "ark-r1cs-std",
  "ark-relations 0.3.0",
  "ark-std 0.3.0",
- "arkworks-native-gadgets 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "arkworks-native-gadgets",
 ]
 
 [[package]]
@@ -577,7 +533,7 @@ dependencies = [
  "ark-relations 0.3.0",
  "ark-serialize 0.3.0",
  "ark-std 0.3.0",
- "arkworks-native-gadgets 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "arkworks-native-gadgets",
  "arkworks-r1cs-circuits",
  "arkworks-r1cs-gadgets",
  "arkworks-utils",
@@ -2013,7 +1969,7 @@ dependencies = [
  "ark-groth16 0.3.0",
  "ark-serialize 0.3.0",
  "ark-std 0.3.0",
- "arkworks-native-gadgets 0.5.3",
+ "arkworks-native-gadgets",
  "arkworks-setups",
  "bech32",
  "cosmwasm-std",
