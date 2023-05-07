@@ -18,9 +18,9 @@ use crate::msg::{
     QueryMsg,
 };
 use crate::state::{
-    Denom, DenomOwnership, SwapContext, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
-    DEPOSIT_VERIFIER, NULLIFIER_HASHES, OWNERSHIP_HASHES, SWAP_CTX, SWAP_DEPOSIT_VERIFIER,
-    SWAP_VERIFIER, WITHDRAW_VERIFIER,
+    Denom, DenomOwnership, SwapContext, ALLOWED_POOLS, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
+    DEPOSIT_VERIFIER, NULLIFIER_HASHES, OWNERSHIP_HASHES, POOL_ADMIN, SWAP_CTX,
+    SWAP_DEPOSIT_VERIFIER, SWAP_VERIFIER, WITHDRAW_VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
@@ -60,6 +60,16 @@ pub fn instantiate(
 
     let tree = MerkleTreeWithHistory::new(20);
     COMMITMENTS.save(deps.storage, &tree)?;
+
+    match msg.pool_admin {
+        Some(addr) => {
+            let addr = deps.api.addr_validate(&addr)?;
+            POOL_ADMIN.save(deps.storage, &addr)?;
+        }
+        // No admin makes allowed pool list immutable
+        None => (),
+    };
+    ALLOWED_POOLS.save(deps.storage, &msg.allowed_pools)?;
 
     Ok(Response::default())
 }
@@ -334,6 +344,23 @@ pub fn execute_withdraw(
         .add_attribute("from", info.sender))
 }
 
+pub fn execute_update_allowed_pools(
+    deps: DepsMut,
+    info: MessageInfo,
+    pools: Vec<String>,
+) -> Result<Response, ContractError> {
+    // No admin makes allowed pool list immutable 
+    let admin = POOL_ADMIN.load(deps.storage)?;
+    if info.sender != admin {
+        return Err(ContractError::Unauthorized {});
+    }
+    ALLOWED_POOLS.save(deps.storage, &pools)?;
+
+    Ok(Response::default()
+        .add_attribute("action", "update_allowed_pools")
+        .add_attribute("from", info.sender))
+}
+
 pub fn get_osmosis_swap_msg(
     contract_addr: Addr,
     routes: Vec<OsmosisRoute>,
@@ -348,7 +375,7 @@ pub fn get_osmosis_swap_msg(
             msg: "Not yet supported".into(),
         })),
     }?;
-    // TODO(!): Verify every pool id in routes is in allowed pools 
+    // TODO(!): Verify every pool id in routes is in allowed pools
 
     // TODO(!): Verify that output denom is last element of routes
     let output_denom = match output_denom {

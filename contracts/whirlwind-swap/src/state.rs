@@ -29,6 +29,11 @@ pub const WITHDRAW_VERIFIER: Item<Verifier> = Item::new("withdraw_verifier");
 pub const COMMITMENTS: Item<MerkleTreeWithHistory> = Item::new("commitments");
 pub const NULLIFIER_HASHES: Map<String, bool> = Map::new("nullifier_hashes");
 
+// Pools need allowance list to prevent minting a new coin in Frontier
+// and exiting liquidity anonymously
+pub const POOL_ADMIN: Item<Addr> = Item::new("admin");
+pub const ALLOWED_POOLS: Item<Vec<String>> = Item::new("allowed_pools"); 
+
 // Ownership hashes
 pub const OWNERSHIP_HASHES: Map<String, (DenomOwnership, u32)> = Map::new("ownership_hashes");
 

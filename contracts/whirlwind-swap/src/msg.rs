@@ -14,6 +14,9 @@ pub struct InstantiateMsg {
     pub amount: Uint128,
     pub denom: DenomUnvalidated,
 
+    pub pool_admin: Option<String>, 
+    pub allowed_pools: Vec<String>,
+
     pub vk_deposit: String,
     pub vk_swap_deposit: String,
     pub vk_swap: String,
