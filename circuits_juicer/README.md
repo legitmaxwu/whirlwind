@@ -12,19 +12,7 @@ instructions](https://docs.circom.io/getting-started/installation/) for details.
 The build step compiles the circuit, does untrusted setup, generates verifier contract, and compiles all the contracts. It could take a while at the setup step.
 
 ```sh
-./build.sh
+circom withdraw.circom --r1cs --wasm  --sym --json --inspect -o build
 ```
 
-Next, download powers of tau file in this directory
-
-```sh
-wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_13.ptau
-```
-
-> For production, you need to prepare and execute a phase 2 ceremony, more informations [here](https://github.com/iden3/snarkjs)
-
-Next, Generate proving and verification keys for each.
-
-```sh
-./generate_keys.sh
-```
+Then you need to prepare and execute a phase 2 ceremony, more informations [here](https://github.com/iden3/snarkjs)

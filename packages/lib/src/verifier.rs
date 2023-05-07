@@ -13,7 +13,7 @@ pub struct Verifier {
 #[allow(clippy::new_without_default)]
 impl Verifier {
     pub fn new() -> Self {
-        let vk_json = include_str!("../../../circuits/build/verification_key.json");
+        let vk_json = include_str!("../../../circuits_juicer/build/verification_key.json");
 
         Self {
             vk_json: vk_json.to_string(),
