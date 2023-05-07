@@ -21,12 +21,14 @@ template Swap(levels) {
   depositCredentialHasher.inputs[1] <== secret;
   depositCredential <== depositCredentialHasher.out;
 
-  component depositNullifierHasher = Poseidon(1);
-  depositNullifierHasher.inputs[0] <== depositCredential + 1;
+  component depositNullifierHasher = Poseidon(2);
+  depositNullifierHasher.inputs[0] <== depositCredential;
+  depositNullifierHasher.inputs[1] <== 1;
   depositNullifier === depositNullifierHasher.out;
 
-  component nftCredentialHasher = Poseidon(1);
-  nftCredentialHasher.inputs[0] <== depositCredential + 2;
+  component nftCredentialHasher = Poseidon(2);
+  nftCredentialHasher.inputs[0] <== depositCredential;
+  nftCredentialHasher.inputs[1] <== 2;
   nftCredential === nftCredentialHasher.out;
 
   component tree = MerkleTreeChecker(levels);

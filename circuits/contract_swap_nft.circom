@@ -18,12 +18,14 @@ template SwapNFT() {
   depositCredentialHasher.inputs[1] <== secret;
   depositCredential <== depositCredentialHasher.out;
 
-  component nftCredentialHasher = Poseidon(1);
-  nftCredentialHasher.inputs[0] <== depositCredential + n;
+  component nftCredentialHasher = Poseidon(2);
+  nftCredentialHasher.inputs[0] <== depositCredential;
+  nftCredentialHasher.inputs[1] <== n;
   nftCredential === nftCredentialHasher.out;
 
-  component newNftCredentialHasher = Poseidon(1);
-  newNftCredentialHasher.inputs[0] <== depositCredential + n + 1;
+  component newNftCredentialHasher = Poseidon(2);
+  newNftCredentialHasher.inputs[0] <== depositCredential;
+  newNftCredentialHasher.inputs[1] <== n + 1;
   newNftCredential === newNftCredentialHasher.out;
 }
 
