@@ -46,6 +46,60 @@ pub fn execute(
     unimplemented!()
 }
 
+pub fn execute_deposit(
+    deps: DepsMut,
+    info: MessageInfo,
+    commitment: String 
+) -> Result<Response, ContractError> {
+    // confirm deposit amount and denom
+    let deposit_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
+    let deposit_denom = DEPOSIT_DENOM.load(deps.storage)?;
+    // TODO(!): Confirm deposit amount and denom
+
+    let mut commitment_mt = COMMITMENTS.load(deps.storage)?;
+    // confirm insert worked
+    let success = commitment_mt.insert(&U256::from_str(&commitment)?); 
+    if success.is_none() {
+        return Err(ContractError::InsertFailed {});
+    }
+
+    COMMITMENTS.save(deps.storage, &commitment_mt)?;
+
+    Ok(Response::new()
+        .add_attribute("action", "deposit")
+        .add_attribute("from", info.sender))
+}
+
+pub fn execute_swap_deposit(
+    deps: DepsMut, 
+    info: MessageInfo
+) -> Result<Response, ContractError> {
+    unimplemented!()
+}
+
+pub fn execute_swap(
+    deps: DepsMut, 
+    info: MessageInfo
+) -> Result<Response, ContractError> {
+    unimplemented!()
+}
+
+pub fn execute_withdraw(
+    deps: DepsMut, 
+    info: MessageInfo
+) -> Result<Response, ContractError> {
+    unimplemented!()
+}
+
+pub fn get_osmosis_swap_msg(
+    input_amount: Uint128,
+    input_denom: Denom,
+    min_output: Uint128,
+    output_denom: Denom
+) -> StdResult {
+    unimplemented!()
+}
+
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
     unimplemented!()

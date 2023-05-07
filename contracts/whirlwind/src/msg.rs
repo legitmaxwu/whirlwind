@@ -15,11 +15,12 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     Deposit {}
-    Withdraw {}
+    SwapDeposit {}
     Swap {
         input_amount: Uint128,
         output_denom: DenomUnvalidated
     }  
+    Withdraw {}
 }
 
 #[cw_serde]
