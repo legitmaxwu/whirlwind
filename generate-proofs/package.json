@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "@noble/curves": "^1.0.0",
     "circomlib": "^2.0.5",

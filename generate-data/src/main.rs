@@ -28,30 +28,46 @@ fn U256(value: &str) -> Uint256 {
 // Define multiple structs to hold the data you want to output
 #[derive(Serialize, Deserialize)]
 struct Deposit {
-    walletAddress: String,
+    // Private
     secret: String,
+    // Public
+    walletAddress: String,
     depositCredential: String,
 }
 
 #[derive(Serialize, Deserialize)]
-struct Swap {
-//       // Private
-//   signal input walletAddress;
-//   signal input secret;
-
-//   // Public
-//   signal input depositTreeRoot;
-//   signal input pathElements[levels];
-//   signal input pathIndices[levels];
-//   signal input depositNullifier;
-//   signal input nftCredential;
-    walletAddress: String,
+struct Migrate {
+    // Private
     secret: String,
+    walletAddress: String,
+    // Public
     depositTreeRoot: String,
     pathElements: Vec<String>,
     pathIndices: Vec<String>,
     depositNullifier: String,
     nftCredential: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Withdraw {
+    // Private
+    secret: String,
+    n: String,
+    // Public
+    walletAddress: String,
+    nftCredential: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Swap {
+    // Private
+    secret: String,
+    walletAddress: String,
+    n: String,
+
+    // Public
+    nftCredential: String,
+    newNftCredential: String,
 }
 
 // Define a generic function to insert output data of any type into a HashMap
@@ -84,8 +100,8 @@ fn main() {
     let mut output_map: HashMap<String, serde_json::Value> = HashMap::new();
 
 
-    let wallet_address = U256("0");
-    let secret = U256("0");
+    let wallet_address = U256("1337");
+    let secret = U256("8000");
     let deposit_credential = poseidon_hash(vec![wallet_address, secret]);
 
 
@@ -96,20 +112,42 @@ fn main() {
         depositCredential: deposit_credential.to_string()
     });
 
-    // Swap
-
+    // Migrate
     let mut tree = MerkleTreeWithHistory::new(20);
     let (index, path_indices, path_elements) = tree.insert_and_return_path(&deposit_credential).unwrap();
     let root = tree.get_last_root();
     let depositNullifier = poseidon_hash(vec![deposit_credential, U256("1")]);
     let nftCredential = poseidon_hash(vec![deposit_credential, U256("2")]);
-    insert_output_data(&mut output_map, "deposit2".to_string(), Swap {
+    insert_output_data(&mut output_map, "migrate1".to_string(), Migrate {
         walletAddress: wallet_address.to_string(),
         secret: secret.to_string(),
         depositTreeRoot: root.to_string(),
         pathElements: path_elements.iter().map(|x| x.to_string()).collect(),
         pathIndices: path_indices.iter().map(|x| x.to_string()).collect(),
         depositNullifier: depositNullifier.to_string(),
+        nftCredential: nftCredential.to_string(),
+    });
+
+    // Swap
+    let n = U256("2");
+    let nPlusOne = U256("3");
+    let nftCredential = poseidon_hash(vec![deposit_credential, n]);
+    let newNftCredential = poseidon_hash(vec![deposit_credential, nPlusOne]);
+    insert_output_data(&mut output_map, "swap1".to_string(), Swap {
+        secret: secret.to_string(),
+        walletAddress: wallet_address.to_string(),
+        n: n.to_string(),
+        nftCredential: nftCredential.to_string(),
+        newNftCredential: newNftCredential.to_string(),
+    });
+
+    // Withdraw
+    let n = U256("3");
+    let nftCredential = poseidon_hash(vec![deposit_credential, n]);
+    insert_output_data(&mut output_map, "withdraw1".to_string(), Withdraw {
+        secret: secret.to_string(),
+        n: n.to_string(),
+        walletAddress: wallet_address.to_string(),
         nftCredential: nftCredential.to_string(),
     });
 
@@ -123,7 +161,7 @@ fn main() {
     let mut file = File::create("outputs/proofInputs.json").unwrap();
 
     // Convert the output_data to a JSON string
-    let output_json = serde_json::to_string(&output_map).unwrap();
+    let output_json = serde_json::to_string_pretty(&output_map).unwrap();
 
     // Write the JSON string to the file
     file.write_all(output_json.as_bytes()).unwrap();
