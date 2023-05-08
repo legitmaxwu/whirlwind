@@ -8,6 +8,13 @@
 <br/>
 <br/>
 <br/>
+  
+## Project Structure
+
+- `contracts`: CosmWasm contracts
+- `circuits`: Circom circuits, script for building proving/verification keys
+- `generate-data`: Generate data for SNARK proofs
+- `generate-proofs`: Generate SNARK proofs
 
 ## Overview
 
@@ -21,13 +28,6 @@ Whirlwind allows for temporarily private trades on Osmosis until withdrawal.
 <p align="center">
 	<img src="/images/diagram.png" width="100%"/>
 </p>
-
-## Project Structure
-
-- `contracts`: CosmWasm contracts
-- `circuits`: Circom circuits, script for building proving/verification keys
-- `generate-data`: Generate data for SNARK proofs
-- `generate-proofs`: Generate SNARK proofs
 
 ## Security
 
