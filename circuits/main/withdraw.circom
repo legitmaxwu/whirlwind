@@ -1,17 +1,15 @@
 pragma circom 2.0.0;
 
 include "../circomlib/circuits/poseidon.circom";
-include "../lib/merkleTree.circom";
 
-template Withdraw(levels) {
+template WithdrawNFT() {
   // Private
-  signal input walletAddress;
   signal input secret;
+  signal input n;
 
   // Public
-  signal input depositTreeRoot;
-  signal input pathElements[levels];
-  signal input pathIndices[levels];
+  signal input walletAddress;
+  signal input nftCredential;
 
   signal depositCredential;
   component depositCredentialHasher = Poseidon(2);
@@ -19,15 +17,12 @@ template Withdraw(levels) {
   depositCredentialHasher.inputs[1] <== secret;
   depositCredential <== depositCredentialHasher.out;
 
-  component tree = MerkleTreeChecker(levels);
-  tree.leaf <== depositCredential;
-  tree.root <== depositTreeRoot;
-  for (var i = 0; i < levels; i++) {
-      tree.pathElements[i] <== pathElements[i];
-      tree.pathIndices[i] <== pathIndices[i];
-  }
+  component nftCredentialHasher = Poseidon(2);
+  nftCredentialHasher.inputs[0] <== depositCredential;
+  nftCredentialHasher.inputs[1] <== n;
+  nftCredential === nftCredentialHasher.out;
 }
 
 component main {
-    public [depositTreeRoot, pathElements, pathIndices]
-} = Withdraw(20);
+    public [walletAddress, nftCredential]
+} = WithdrawNFT();

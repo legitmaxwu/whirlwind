@@ -1,5 +1,5 @@
 import * as snarkjs from "snarkjs";
-import proofInputs from "../generate-data/outputs/proofInputs.json";
+import proofInputs from "../generate-data/outputs/proofInputs.json" assert { type: "json" };
 import * as fs from "fs";
 
 const makeProof = async (_proofInput: any, _wasm: string, _zkey: string) => {
@@ -22,10 +22,7 @@ async function main() {
   const promises = Object.entries(proofInputs).map(([key, value]) => {
     const { wasmFile, provingKeyFile } = getFileNames(value.type);
 
-    return makeProof(value.data, wasmFile, provingKeyFile).catch((err) => {
-      console.log("Error with", key);
-      console.log(err);
-    });
+    return makeProof(value.data, wasmFile, provingKeyFile);
   });
 
   const proofs = await Promise.all(promises);
@@ -40,4 +37,6 @@ async function main() {
   });
 }
 
-main();
+await main().catch((err) => {
+  console.error(err);
+});

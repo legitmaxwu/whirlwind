@@ -1,19 +1,16 @@
 pragma circom 2.0.0;
 
 include "../circomlib/circuits/poseidon.circom";
-include "../lib/merkleTree.circom";
 
-template Swap(levels) {
+template SwapNFT() {
   // Private
-  signal input walletAddress;
   signal input secret;
+  signal input walletAddress;
+  signal input n;
 
   // Public
-  signal input depositTreeRoot;
-  signal input pathElements[levels];
-  signal input pathIndices[levels];
-  signal input depositNullifier;
   signal input nftCredential;
+  signal input newNftCredential;
 
   signal depositCredential;
   component depositCredentialHasher = Poseidon(2);
@@ -21,25 +18,17 @@ template Swap(levels) {
   depositCredentialHasher.inputs[1] <== secret;
   depositCredential <== depositCredentialHasher.out;
 
-  component depositNullifierHasher = Poseidon(2);
-  depositNullifierHasher.inputs[0] <== depositCredential;
-  depositNullifierHasher.inputs[1] <== 1;
-  depositNullifier === depositNullifierHasher.out;
-
   component nftCredentialHasher = Poseidon(2);
   nftCredentialHasher.inputs[0] <== depositCredential;
-  nftCredentialHasher.inputs[1] <== 2;
+  nftCredentialHasher.inputs[1] <== n;
   nftCredential === nftCredentialHasher.out;
 
-  component tree = MerkleTreeChecker(levels);
-  tree.leaf <== depositCredential;
-  tree.root <== depositTreeRoot;
-  for (var i = 0; i < levels; i++) {
-      tree.pathElements[i] <== pathElements[i];
-      tree.pathIndices[i] <== pathIndices[i];
-  }
+  component newNftCredentialHasher = Poseidon(2);
+  newNftCredentialHasher.inputs[0] <== depositCredential;
+  newNftCredentialHasher.inputs[1] <== n + 1;
+  newNftCredential === newNftCredentialHasher.out;
 }
 
 component main {
-    public [depositTreeRoot, pathElements, pathIndices, depositNullifier, nftCredential]
-} = Swap(20);
+    public [nftCredential, newNftCredential]
+} = SwapNFT();

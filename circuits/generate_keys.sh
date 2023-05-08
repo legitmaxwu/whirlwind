@@ -1,6 +1,6 @@
 #!/bin/bash
 
-contracts=("deposit" "swap" "withdraw" "swap_nft" "withdraw_nft")
+contracts=("deposit" "migrate" "swap" "withdraw")
 
 for contract in "${contracts[@]}"
 do
