@@ -473,4 +473,23 @@ pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use lib::msg::CircomProof;
+
+    use super::*;
+
+    #[test]
+    fn test_sanity() {
+        assert_eq!(1, 1);
+        let deposit_vk: &str = include_str!("../../../circuits/verification_keys/deposit.vk.json");
+        let v = Verifier::from_vk(deposit_vk.to_string()); 
+        let proof_json = include_str!("../../../generate-proofs/outputs/deposit1.json");
+        let proof: Proof<Bn254> = CircomProof::from(proof_json.to_string()).to_proof();
+        let public_signals = PublicSignals(vec![
+            "1337".to_string(),
+            "2880600617345714039494384748645461738150340256226005947162982605579534386469".to_string()
+        ]);
+        let res = v.verify_proof(proof, &public_signals.get());
+        assert_eq!(res, true);
+    }
+}
