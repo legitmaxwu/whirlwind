@@ -1,5 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Uint128, Coin};
+use lib::msg::CircomProof;
 
 use crate::state::Denom;
 
@@ -30,7 +31,12 @@ pub enum ExecuteMsg {
         deposit_credential: String,
         withdraw_addr: String,
     },
-    SwapDeposit {
+    MigrateDeposit {
+        proof: CircomProof,
+
+        root: String, 
+        nullifier_hash: String,
+        deposit_credential_hash: String,
     },
     Swap {
         routes: Vec<OsmosisRoute>,
