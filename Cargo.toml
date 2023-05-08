@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "contracts/cw-juicer",
     "contracts/whirlwind-swap",
     "packages/lib",
     "generate-data"
