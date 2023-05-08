@@ -32,30 +32,30 @@ struct Deposit {
     secret: String,
     // Public
     walletAddress: String,
-    depositCredential: String,
+    credential: String,
 }
 
 #[derive(Serialize, Deserialize)]
 struct Migrate {
     // Private
-    secret: String,
     walletAddress: String,
-    // Public
-    depositTreeRoot: String,
+    secret: String,
+    previousSecret: String,
     pathElements: Vec<String>,
     pathIndices: Vec<String>,
-    depositNullifier: String,
-    nftCredential: String,
+    // Public
+    depositTreeRoot: String,
+    nullifier: String,
+    previousNullifier: String,
 }
 
 #[derive(Serialize, Deserialize)]
 struct Withdraw {
     // Private
-    secret: String,
-    n: String,
-    // Public
     walletAddress: String,
-    nftCredential: String,
+    previousSecret: String,
+    // Public
+    previousNullifier: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -102,37 +102,42 @@ fn main() {
 
     let wallet_address = U256("1337");
     let secret = U256("8000");
-    let deposit_credential = poseidon_hash(vec![wallet_address, secret]);
+    let previousSecret = U256("8001");
+    let credential = poseidon_hash(vec![wallet_address, secret]);
+    let nullifier = poseidon_hash(vec![wallet_address, secret, U256("1")]);
+    let previousCredential = poseidon_hash(vec![wallet_address, previousSecret]);
+    let previousNullifier = poseidon_hash(vec![wallet_address, previousSecret, U256("1")]);
+    let mut tree = MerkleTreeWithHistory::new(20);
+    let (index, path_indices, path_elements) = tree.insert_and_return_path(&credential).unwrap();
+    let root = tree.get_last_root();
 
 
     // Deposit
     insert_output_data(&mut output_map, "deposit1".to_string(), Deposit {
         walletAddress: wallet_address.to_string(),
         secret: secret.to_string(),
-        depositCredential: deposit_credential.to_string()
+        credential: credential.to_string()
     });
 
     // Migrate
-    let mut tree = MerkleTreeWithHistory::new(20);
-    let (index, path_indices, path_elements) = tree.insert_and_return_path(&deposit_credential).unwrap();
-    let root = tree.get_last_root();
-    let depositNullifier = poseidon_hash(vec![deposit_credential, U256("1")]);
-    let nftCredential = poseidon_hash(vec![deposit_credential, U256("2")]);
+
+
     insert_output_data(&mut output_map, "migrate1".to_string(), Migrate {
         walletAddress: wallet_address.to_string(),
         secret: secret.to_string(),
-        depositTreeRoot: root.to_string(),
+        previousSecret: previousSecret.to_string(),
         pathElements: path_elements.iter().map(|x| x.to_string()).collect(),
         pathIndices: path_indices.iter().map(|x| x.to_string()).collect(),
-        depositNullifier: depositNullifier.to_string(),
-        nftCredential: nftCredential.to_string(),
+        depositTreeRoot: root.to_string(),
+        nullifier: nullifier.to_string(),
+        previousNullifier: previousNullifier.to_string(),
     });
 
     // Swap
     let n = U256("2");
     let nPlusOne = U256("3");
-    let nftCredential = poseidon_hash(vec![deposit_credential, n]);
-    let newNftCredential = poseidon_hash(vec![deposit_credential, nPlusOne]);
+    let nftCredential = poseidon_hash(vec![credential, n]);
+    let newNftCredential = poseidon_hash(vec![credential, nPlusOne]);
     insert_output_data(&mut output_map, "swap1".to_string(), Swap {
         secret: secret.to_string(),
         walletAddress: wallet_address.to_string(),
@@ -143,18 +148,12 @@ fn main() {
 
     // Withdraw
     let n = U256("3");
-    let nftCredential = poseidon_hash(vec![deposit_credential, n]);
+    let nftCredential = poseidon_hash(vec![credential, n]);
     insert_output_data(&mut output_map, "withdraw1".to_string(), Withdraw {
-        secret: secret.to_string(),
-        n: n.to_string(),
         walletAddress: wallet_address.to_string(),
-        nftCredential: nftCredential.to_string(),
+        previousSecret: previousSecret.to_string(),
+        previousNullifier: previousNullifier.to_string(),
     });
-
-
-
-
-
 
 
     // Open a file for writing

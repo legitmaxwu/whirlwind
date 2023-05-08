@@ -1,45 +1,68 @@
 pragma circom 2.0.0;
 
 include "../circomlib/circuits/poseidon.circom";
+include "../circomlib/circuits/comparators.circom";
+include "../circomlib/circuits/gates.circom";
 include "../lib/merkleTree.circom";
 
-template Swap(levels) {
+template Swap(merkleTreeHeight) {
   // Private
   signal input walletAddress;
   signal input secret;
+  signal input previousSecret;
+  signal input pathElements[merkleTreeHeight];
+  signal input pathIndices[merkleTreeHeight];
 
   // Public
   signal input depositTreeRoot;
-  signal input pathElements[levels];
-  signal input pathIndices[levels];
-  signal input depositNullifier;
-  signal input nftCredential;
+  signal input nullifier;
+  signal input previousNullifier;
 
+  // Verify membership of deposit credential in the deposit tree
   signal depositCredential;
   component depositCredentialHasher = Poseidon(2);
   depositCredentialHasher.inputs[0] <== walletAddress;
   depositCredentialHasher.inputs[1] <== secret;
   depositCredential <== depositCredentialHasher.out;
 
-  component depositNullifierHasher = Poseidon(2);
-  depositNullifierHasher.inputs[0] <== depositCredential;
-  depositNullifierHasher.inputs[1] <== 1;
-  depositNullifier === depositNullifierHasher.out;
-
-  component nftCredentialHasher = Poseidon(2);
-  nftCredentialHasher.inputs[0] <== depositCredential;
-  nftCredentialHasher.inputs[1] <== 2;
-  nftCredential === nftCredentialHasher.out;
-
-  component tree = MerkleTreeChecker(levels);
+  component tree = MerkleTreeChecker(merkleTreeHeight);
   tree.leaf <== depositCredential;
   tree.root <== depositTreeRoot;
-  for (var i = 0; i < levels; i++) {
+  for (var i = 0; i < merkleTreeHeight; i++) {
       tree.pathElements[i] <== pathElements[i];
       tree.pathIndices[i] <== pathIndices[i];
   }
+
+  // Verify nullifier calculation
+  component nullifierHasher = Poseidon(3);
+  nullifierHasher.inputs[0] <== walletAddress;
+  nullifierHasher.inputs[1] <== secret;
+  nullifierHasher.inputs[2] <== 1;
+  nullifier === nullifierHasher.out;
+
+  // Verify previous nullifier calculation
+  signal calculatedPreviousNullifier;
+  component previousNullifierHasher = Poseidon(3);
+  previousNullifierHasher.inputs[0] <== walletAddress;
+  previousNullifierHasher.inputs[1] <== previousSecret;
+  previousNullifierHasher.inputs[2] <== 1;
+  calculatedPreviousNullifier <== previousNullifierHasher.out;
+
+  // Check that the previous nullifier is either the calculated one or 0.
+  component eq1 = IsEqual();
+  eq1.in[0] <== previousNullifier;
+  eq1.in[1] <== 0;
+
+  component eq2 = IsEqual();
+  eq2.in[1] <== previousNullifier;
+  eq2.in[0] <== calculatedPreviousNullifier;
+
+  component orGate = OR();
+  orGate.a <== eq1.out;
+  orGate.b <== eq2.out;
+  orGate.out === 1;
 }
 
 component main {
-    public [depositTreeRoot, depositNullifier, nftCredential]
+    public [depositTreeRoot, nullifier, previousNullifier]
 } = Swap(20);

@@ -8,20 +8,20 @@ template Deposit() {
 
   // Public
   signal input walletAddress;
-  signal input depositCredential;
+  signal input credential;
 
-  component depositCredentialHasher = Poseidon(2);
-  depositCredentialHasher.inputs[0] <== walletAddress;
-  depositCredentialHasher.inputs[1] <== secret;
+  component credentialHasher = Poseidon(2);
+  credentialHasher.inputs[0] <== walletAddress;
+  credentialHasher.inputs[1] <== secret;
 
   // log("walletAddress", walletAddress);
   // log("secret", secret);
-  // log("depositCredentialHasher.out", depositCredentialHasher.out);
-  // log("depositCredential", depositCredential);
+  // log("credentialHasher.out", credentialHasher.out);
+  // log("credential", credential);
 
-  depositCredential === depositCredentialHasher.out;
+  credential === credentialHasher.out;
 }
 
 component main {
-    public [walletAddress, depositCredential]
+    public [walletAddress, credential]
 } = Deposit();

@@ -4,25 +4,20 @@ include "../circomlib/circuits/poseidon.circom";
 
 template WithdrawNFT() {
   // Private
-  signal input secret;
-  signal input n;
+  signal input previousSecret;
 
   // Public
   signal input walletAddress;
-  signal input nftCredential;
+  signal input previousNullifier;
 
   signal depositCredential;
-  component depositCredentialHasher = Poseidon(2);
+  component depositCredentialHasher = Poseidon(3);
   depositCredentialHasher.inputs[0] <== walletAddress;
-  depositCredentialHasher.inputs[1] <== secret;
-  depositCredential <== depositCredentialHasher.out;
-
-  component nftCredentialHasher = Poseidon(2);
-  nftCredentialHasher.inputs[0] <== depositCredential;
-  nftCredentialHasher.inputs[1] <== n;
-  nftCredential === nftCredentialHasher.out;
+  depositCredentialHasher.inputs[1] <== previousSecret;
+  depositCredentialHasher.inputs[2] <== 1;
+  previousNullifier === depositCredentialHasher.out;
 }
 
 component main {
-    public [walletAddress, nftCredential]
+    public [walletAddress, previousNullifier]
 } = WithdrawNFT();
