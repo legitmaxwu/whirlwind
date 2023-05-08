@@ -4,16 +4,18 @@
 	<img src="/whirlwind-logo.png" width="400"/>
 </p>
 <p align="center">
-  Tax-Compliant Private Trades on Osmosis
+  Tax-Compliant Private Trades on Osmosis. <a href="/papers/whirlwind.pdf">Paper</a>
+<br/>
+<br/>
 <br/>
 
-## Getting Started
 
-```
-cargo build
+## Project Structure
 
-cargo test
-```
+- `contracts`: CosmWasm contracts
+- `circuits`: Circom circuits, script for building proving/verification keys
+- `generate-data`: Generate data for SNARK proofs
+- `generate-proofs`: Generate SNARK proofs
 
 ## Security
 
@@ -37,3 +39,8 @@ Vectors of failure:
 - Will Osmosis support CW-20s?
 - Bigger root history size
 - Handle any string for wallet address input
+
+## Acknowledgements
+
+- [webb.tools](https://webb.tools/)
+- [gitopia.com/Juicer/juicy-10000](https://gitopia.com/Juicer/juicy-10000)
