@@ -1,8 +1,10 @@
 <br/><br/>
 
 <p align="center">
-	<img src="/whirlwind-logo.png" width="200"/>
+	<img src="/whirlwind-logo.png" width="400"/>
 </p>
+<p align="center">
+  Tax-Compliant Private Trades on Osmosis
 <br/>
 
 ## Getting Started
