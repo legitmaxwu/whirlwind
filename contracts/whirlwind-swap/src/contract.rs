@@ -6,7 +6,7 @@ use ark_groth16::Proof;
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     to_binary, Addr, BankMsg, Binary, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply,
-    Response, StdError, StdResult, SubMsg, Uint128, Uint256, WasmMsg, Storage,
+    Response, StdError, StdResult, Storage, SubMsg, Uint128, Uint256, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg;
@@ -18,9 +18,9 @@ use crate::msg::{
     QueryMsg,
 };
 use crate::state::{
-    Denom, AmountDenom, SwapContext, ALLOWED_POOLS, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
-    DEPOSIT_VERIFIER, MIGRATE_VERIFIER, NULLIFIERS, POOL_ADMIN, SWAP_CTX,
-    WITHDRAW_VERIFIER, MAP_ADDR_TO_LOCKED_BALANCES, MAP_ADDR_TO_PREVIOUS_NULLIFIER,
+    AmountDenom, Denom, SwapContext, ALLOWED_POOLS, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
+    DEPOSIT_VERIFIER, MAP_ADDR_TO_LOCKED_BALANCES, MAP_ADDR_TO_PREVIOUS_NULLIFIER,
+    MIGRATE_VERIFIER, NULLIFIERS, POOL_ADMIN, SWAP_CTX, WITHDRAW_VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
@@ -31,8 +31,8 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const SWAP_REPLY_ID: u64 = 1;
 
-pub fn hash_string(input: &str) -> String {
-    // TODO: Poseidon hash on input
+pub fn poseidon_hash(input: &str) -> String {
+    // TODO(!): Poseidon hash on input
     return input.to_string();
 }
 
@@ -94,7 +94,6 @@ fn remove_amount_denom_to_locked_balance(
     Ok(())
 }
 
-
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     deps: DepsMut,
@@ -150,14 +149,7 @@ pub fn execute(
             withdraw_addr,
         } => {
             let withdraw_addr = deps.api.addr_validate(&withdraw_addr)?;
-            execute_deposit(
-                deps,
-                info,
-                env,
-                proof.to_proof(),
-                credential,
-                withdraw_addr,
-            )
+            execute_deposit(deps, info, env, proof.to_proof(), credential, withdraw_addr)
         }
         _ => unimplemented!(),
     }
@@ -201,7 +193,7 @@ pub fn execute_deposit(
     // 2. Verify SNARK
     let verifier = DEPOSIT_VERIFIER.load(deps.storage)?;
     let public_signals = PublicSignals(vec![
-        hash_string(&withdraw_addr.to_string()).to_string(),
+        poseidon_hash(&withdraw_addr.to_string()).to_string(),
         credential.clone(),
     ]);
     let success = verifier.verify_proof(proof, &public_signals.get());
@@ -253,8 +245,8 @@ pub fn execute_migrate_deposit(
 
     // Get previous nullifier. If none, set to 0
     let previous_nullifier = MAP_ADDR_TO_PREVIOUS_NULLIFIER
-    .may_load(deps.storage, info.sender.clone())?
-    .unwrap_or(Uint256::zero());
+        .may_load(deps.storage, info.sender.clone())?
+        .unwrap_or(Uint256::zero());
 
     let verifier = MIGRATE_VERIFIER.load(deps.storage)?;
     let public_signals = PublicSignals(vec![
@@ -270,17 +262,24 @@ pub fn execute_migrate_deposit(
     // 3. Give amount, denom to user.
     let deposit_denom = DEPOSIT_DENOM.load(deps.storage)?;
     let deposit_amount = DEPOSIT_AMOUNT.load(deps.storage)?;
-    add_amount_denom_to_locked_balance(deps.storage, info.sender.clone(), AmountDenom {
-        amount: deposit_amount,
-        denom: deposit_denom.clone(),
-    })?;
-
+    add_amount_denom_to_locked_balance(
+        deps.storage,
+        info.sender.clone(),
+        AmountDenom {
+            amount: deposit_amount,
+            denom: deposit_denom.clone(),
+        },
+    )?;
 
     // 4. Insert nullifier hash into map
     NULLIFIERS.save(deps.storage, nullifier.clone(), &true)?;
 
     // 5. Set nullifier to previous nullifier
-    MAP_ADDR_TO_PREVIOUS_NULLIFIER.save(deps.storage, info.sender.clone(), &Uint256::from_str(&nullifier.clone())?)?;
+    MAP_ADDR_TO_PREVIOUS_NULLIFIER.save(
+        deps.storage,
+        info.sender.clone(),
+        &Uint256::from_str(&nullifier.clone())?,
+    )?;
 
     Ok(Response::new()
         .add_attribute("action", "migrate_deposit")
@@ -307,10 +306,14 @@ pub fn execute_swap(
     };
 
     // Try to remove amount from locked balance
-    remove_amount_denom_to_locked_balance(deps.storage, info.sender.clone(), AmountDenom {
-        amount: input_amount,
-        denom: input_denom_validated.clone(),
-    })?;
+    remove_amount_denom_to_locked_balance(
+        deps.storage,
+        info.sender.clone(),
+        AmountDenom {
+            amount: input_amount,
+            denom: input_denom_validated.clone(),
+        },
+    )?;
 
     // Add swap message with reply handler
     let allowed_pool_ids = ALLOWED_POOLS.load(deps.storage)?;
@@ -324,13 +327,16 @@ pub fn execute_swap(
         output_denom_validated.clone(),
     )?;
     let sub_msg = SubMsg::reply_on_success(msg, SWAP_REPLY_ID);
-    let output_balance_before_swap =
-        get_denom_balance(deps.as_ref(), output_denom_validated.clone(), env.contract.address)?;
+    let output_balance_before_swap = get_denom_balance(
+        deps.as_ref(),
+        output_denom_validated.clone(),
+        env.contract.address,
+    )?;
     SWAP_CTX.save(
         deps.storage,
         &SwapContext {
             // Save the output of the swap into the contract state, so we can use it when handling the reply from the swap
-            swapperAddr: info.sender.clone(),
+            swapper_addr: info.sender.clone(),
             output_balance_before_swap,
             output_denom: output_denom_validated.clone(),
         },
@@ -349,25 +355,22 @@ pub fn execute_withdraw(
     proof: Proof<Bn254>,
     withdraw_addr: Addr,
 ) -> Result<Response, ContractError> {
-
     // 1. Verify SNARK
 
     // Get previous nullifier. If none, set to 0
     let previous_nullifier = MAP_ADDR_TO_PREVIOUS_NULLIFIER
-    .may_load(deps.storage, info.sender.clone())?
-    .unwrap_or(Uint256::zero());
-
+        .may_load(deps.storage, info.sender.clone())?
+        .unwrap_or(Uint256::zero());
 
     let verifier = WITHDRAW_VERIFIER.load(deps.storage)?;
     let public_signals = PublicSignals(vec![
-        hash_string(&withdraw_addr.to_string()).to_string(),
+        poseidon_hash(&withdraw_addr.to_string()).to_string(),
         previous_nullifier.to_string(),
     ]);
     let success = verifier.verify_proof(proof, &public_signals.get());
     if !success {
         return Err(ContractError::InvalidProof {});
     }
-
 
     // 2. Send all funds to withdraw address
 
@@ -479,7 +482,7 @@ pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractEr
     match msg.id {
         SWAP_REPLY_ID => {
             let SwapContext {
-                swapperAddr,
+                swapper_addr,
                 output_balance_before_swap,
                 output_denom,
             } = SWAP_CTX.load(deps.storage)?;
@@ -497,11 +500,15 @@ pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractEr
                 })?;
 
             // Add output amount to locked balance
-            add_amount_denom_to_locked_balance(deps.storage, swapperAddr.clone(), AmountDenom {
-                amount: output_amount,
-                denom: output_denom.clone(),
-            })?;
-            
+            add_amount_denom_to_locked_balance(
+                deps.storage,
+                swapper_addr.clone(),
+                AmountDenom {
+                    amount: output_amount,
+                    denom: output_denom.clone(),
+                },
+            )?;
+
             Ok(Response::default())
         }
         _ => Err(ContractError::Std(StdError::GenericErr {
@@ -535,10 +542,10 @@ pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use cosmwasm_schema::cw_serde;
     use lib::msg::CircomProof;
     use serde_json;
-    use super::*;
 
     #[cw_serde]
     pub struct ProofData {
@@ -549,20 +556,27 @@ mod tests {
     #[test]
     fn test_deposit() {
         let deposit_vk: &str = include_str!("../../../circuits/verification_keys/deposit.vk.json");
-        let v = Verifier::from_vk(deposit_vk.to_string()); 
-        let proof_data_json: ProofData = serde_json::from_str(include_str!("../../../generate-proofs/outputs/deposit1.json")).unwrap();
+        let v = Verifier::from_vk(deposit_vk.to_string());
+        let proof_data_json: ProofData = serde_json::from_str(include_str!(
+            "../../../generate-proofs/outputs/deposit1.json"
+        ))
+        .unwrap();
         let proof = proof_data_json.proof.clone();
 
-        let public_signals = PublicSignals::from_json(serde_json::to_string(&proof_data_json.public_signals).unwrap());
-        let res = v.clone().verify_proof(proof.clone().to_proof(), &public_signals.clone().get());
+        let public_signals = PublicSignals::from_json(
+            serde_json::to_string(&proof_data_json.public_signals).unwrap(),
+        );
+        let res = v
+            .clone()
+            .verify_proof(proof.clone().to_proof(), &public_signals.clone().get());
         assert_eq!(res, true);
 
         // Bad public signal address
         let bad_signals = PublicSignals(vec![
-            // Bech32 addresses have characters and PublicSignals can only take Uint256  
+            // Bech32 addresses have characters and PublicSignals can only take Uint256
             "432".into(),
             public_signals.0[1].clone(),
-        ]); 
+        ]);
         let res = v.verify_proof(proof.to_proof(), &bad_signals.get());
         assert_eq!(res, false);
     }
