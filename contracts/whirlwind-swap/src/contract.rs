@@ -5,8 +5,8 @@ use ark_groth16::Proof;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Addr, BankMsg, Binary, Coin, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Reply,
-    Response, StdError, StdResult, Storage, SubMsg, Uint128, Uint256, WasmMsg,
+    to_binary, Addr, BankMsg, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, StdError,
+    StdResult, Storage, SubMsg, Uint128, Uint256, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg;
@@ -30,6 +30,9 @@ const CONTRACT_NAME: &str = "crates.io:whirlwind";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const SWAP_REPLY_ID: u64 = 1;
+
+type Response = cosmwasm_std::Response<OsmosisSwap>;
+type CosmosMsg = cosmwasm_std::CosmosMsg<OsmosisSwap>;
 
 pub fn poseidon_hash(input: &str) -> String {
     // TODO(!): Poseidon hash on input
@@ -151,7 +154,44 @@ pub fn execute(
             let withdraw_addr = deps.api.addr_validate(&withdraw_addr)?;
             execute_deposit(deps, info, env, proof.to_proof(), credential, withdraw_addr)
         }
-        _ => unimplemented!(),
+        ExecuteMsg::MigrateDeposit {
+            proof,
+            root,
+            nullifier_hash,
+        } => execute_migrate_deposit(deps, info, env, proof.to_proof(), root, nullifier_hash),
+        ExecuteMsg::Swap {
+            routes,
+            input_amount,
+            input_denom,
+            min_output_amount,
+            output_denom,
+        } => execute_swap(
+            deps,
+            info,
+            env,
+            routes,
+            input_amount,
+            input_denom,
+            min_output_amount,
+            output_denom,
+        ),
+        ExecuteMsg::Withdraw {
+            proof,
+            withdraw_addr,
+            burner_addr,
+        } => {
+            let withdraw_addr = deps.api.addr_validate(&withdraw_addr)?;
+            let burner_addr = deps.api.addr_validate(&burner_addr)?;
+            execute_withdraw(
+                deps,
+                info,
+                env,
+                proof.to_proof(),
+                withdraw_addr,
+                burner_addr,
+            )
+        }
+        ExecuteMsg::UpdateAllowedPools { pools } => execute_update_allowed_pools(deps, info, pools),
     }
 }
 
@@ -211,7 +251,7 @@ pub fn execute_deposit(
 
     COMMITMENTS.save(deps.storage, &commitment_mt)?;
 
-    Ok(Response::new()
+    Ok(Response::default()
         .add_messages(msgs)
         .add_attribute("action", "deposit")
         .add_attribute("from", info.sender))
@@ -295,7 +335,7 @@ pub fn execute_swap(
     input_denom: DenomUnvalidated,
     min_output_amount: Uint128,
     output_denom: DenomUnvalidated,
-) -> Result<Response<OsmosisSwap>, ContractError> {
+) -> Result<Response, ContractError> {
     let input_denom_validated = match input_denom {
         DenomUnvalidated::Native(denom) => Denom::Native(denom),
         DenomUnvalidated::Cw20(addr) => Denom::Cw20(deps.api.addr_validate(&addr)?),
@@ -439,7 +479,7 @@ pub fn get_osmosis_swap_msg(
     input_denom: Denom,
     min_output: Uint128,
     output_denom: Denom,
-) -> Result<CosmosMsg<OsmosisSwap>, ContractError> {
+) -> Result<CosmosMsg, ContractError> {
     let input_denom = match input_denom {
         Denom::Native(denom) => Ok(denom),
         Denom::Cw20(_) => Err(ContractError::Std(StdError::GenericErr {
