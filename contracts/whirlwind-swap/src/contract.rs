@@ -474,22 +474,35 @@ pub fn query(_deps: Deps, _env: Env, _msg: QueryMsg) -> StdResult<Binary> {
 
 #[cfg(test)]
 mod tests {
+    use cosmwasm_schema::cw_serde;
     use lib::msg::CircomProof;
-
+    use serde_json;
     use super::*;
+
+    #[cw_serde]
+    pub struct ProofData {
+        pub proof: CircomProof,
+        pub public_signals: Vec<String>,
+    }
 
     #[test]
     fn test_sanity() {
-        assert_eq!(1, 1);
         let deposit_vk: &str = include_str!("../../../circuits/verification_keys/deposit.vk.json");
         let v = Verifier::from_vk(deposit_vk.to_string()); 
-        let proof_json = include_str!("../../../generate-proofs/outputs/deposit1.json");
-        let proof: Proof<Bn254> = CircomProof::from(proof_json.to_string()).to_proof();
-        let public_signals = PublicSignals(vec![
-            "1337".to_string(),
-            "2880600617345714039494384748645461738150340256226005947162982605579534386469".to_string()
-        ]);
-        let res = v.verify_proof(proof, &public_signals.get());
+        let proof_data_json: ProofData = serde_json::from_str(include_str!("../../../generate-proofs/outputs/deposit1.json")).unwrap();
+        let proof = proof_data_json.proof.clone();
+
+        let public_signals = PublicSignals::from_json(serde_json::to_string(&proof_data_json.public_signals).unwrap());
+        let res = v.clone().verify_proof(proof.clone().to_proof(), &public_signals.clone().get());
         assert_eq!(res, true);
+
+        // Bad public signal address
+        let bad_signals = PublicSignals(vec![
+            // Bech32 addresses have characters and PublicSignals can only take Uint256  
+            "432".into(),
+            public_signals.0[1].clone(),
+        ]); 
+        let res = v.verify_proof(proof.to_proof(), &bad_signals.get());
+        assert_eq!(res, false);
     }
 }

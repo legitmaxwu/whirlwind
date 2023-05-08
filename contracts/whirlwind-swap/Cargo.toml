@@ -42,3 +42,6 @@ thiserror = { version = "1.0.31" }
 
 ark-groth16 = { version = "^0.3.0", default-features = false }
 ark-bn254 = { version = "^0.3.0", default-features = false, features = [ "curve" ] }
+
+[dev-dependencies]
+serde_json = { workspace = true }
