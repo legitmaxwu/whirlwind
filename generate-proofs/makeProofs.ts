@@ -12,7 +12,7 @@ function getFileNames(type: string) {
   return {
     wasmFile: `../circuits/build/${lower}/${lower}_js/${lower}.wasm`,
     provingKeyFile: `../circuits/build/${lower}/${lower}.zkey`,
-    verificationKeyFile: `../circuits/build/${lower}/${lower}.vk.json`,
+    verificationKeyFile: `../circuits/verification_keys/${lower}.vk.json`,
   };
 }
 
