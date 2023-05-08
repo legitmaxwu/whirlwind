@@ -19,8 +19,8 @@ use crate::msg::{
 };
 use crate::state::{
     Denom, DenomOwnership, SwapContext, ALLOWED_POOLS, COMMITMENTS, DEPOSIT_AMOUNT, DEPOSIT_DENOM,
-    DEPOSIT_VERIFIER, NULLIFIER_HASHES, OWNERSHIP_HASHES, POOL_ADMIN, SWAP_CTX,
-    MIGRATE_VERIFIER, SWAP_VERIFIER, WITHDRAW_VERIFIER,
+    DEPOSIT_VERIFIER, MIGRATE_VERIFIER, NULLIFIER_HASHES, OWNERSHIP_HASHES, POOL_ADMIN, SWAP_CTX,
+    SWAP_VERIFIER, WITHDRAW_VERIFIER,
 };
 use lib::merkle_tree::MerkleTreeWithHistory;
 use lib::verifier::Verifier;
@@ -84,13 +84,18 @@ pub fn execute(
     match msg {
         ExecuteMsg::Deposit {
             proof,
-            deposit_credential,
+            deposit_credential_hash,
             withdraw_addr,
         } => {
             let withdraw_addr = deps.api.addr_validate(&withdraw_addr)?;
-            // TODO(!): Convert proof to native type here
-            // execute_deposit(deps, info, env, proof, deposit_credential, withdraw_addr)
-            unimplemented!()
+            execute_deposit(
+                deps,
+                info,
+                env,
+                proof.to_proof(),
+                deposit_credential_hash,
+                withdraw_addr,
+            )
         }
         _ => unimplemented!(),
     }
@@ -380,7 +385,7 @@ pub fn get_osmosis_swap_msg(
                 id: route.pool_id.clone(),
             });
         }
-        // Quite important to check that the output denom is the last element 
+        // Quite important to check that the output denom is the last element
         if (i == routes.len() - 1) && (route.token_out_denom != output_denom) {
             return Err(ContractError::Std(StdError::GenericErr {
                 msg: "Output denom must be last element of routes".into(),

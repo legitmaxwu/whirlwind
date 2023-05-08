@@ -28,7 +28,7 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     Deposit {
         proof: CircomProof,
-        deposit_credential: String,
+        deposit_credential_hash: String,
         withdraw_addr: String,
     },
     MigrateDeposit {
