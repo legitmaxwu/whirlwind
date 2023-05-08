@@ -25,14 +25,21 @@ async function main() {
     return makeProof(value.data, wasmFile, provingKeyFile);
   });
 
-  const proofs = await Promise.all(promises);
+  const results = await Promise.all(promises);
 
   // save each file in key.json
-  proofs.forEach((proof, i) => {
+  results.forEach((result, i) => {
     //save proof
     const key = Object.keys(proofInputs)[i];
     const proofFile = `outputs/${key}.json`;
-    const proofJson = JSON.stringify(proof, null, 2);
+    const proofJson = JSON.stringify(
+      {
+        proof: result.proof,
+        public_signals: result.publicSignals,
+      },
+      null,
+      2
+    );
     fs.writeFileSync(proofFile, proofJson);
   });
 }
