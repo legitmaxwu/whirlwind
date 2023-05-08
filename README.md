@@ -1,4 +1,11 @@
-# Getting Started
+<br/><br/>
+
+<p align="center">
+	<img src="/whirlwind-logo.png" width="200"/>
+</p>
+<br/>
+
+## Getting Started
 
 ```
 cargo build
@@ -6,7 +13,7 @@ cargo build
 cargo test
 ```
 
-# Security
+## Security
 
 The contract fails if:
 
@@ -22,7 +29,7 @@ Vectors of failure:
 - Pool whitelisting and updates
 - Withdrawals (is it correct to source)
 
-# Future Work
+## Future Work
 
 - Output denom should be inferred from the passed in routes
 - Will Osmosis support CW-20s?
