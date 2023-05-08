@@ -351,15 +351,16 @@ pub fn execute_swap(
 pub fn execute_withdraw(
     deps: DepsMut,
     info: MessageInfo,
-    env: Env,
+    _env: Env,
     proof: Proof<Bn254>,
     withdraw_addr: Addr,
+    burner_addr: Addr,
 ) -> Result<Response, ContractError> {
     // 1. Verify SNARK
 
     // Get previous nullifier. If none, set to 0
     let previous_nullifier = MAP_ADDR_TO_PREVIOUS_NULLIFIER
-        .may_load(deps.storage, info.sender.clone())?
+        .may_load(deps.storage, burner_addr.clone())?
         .unwrap_or(Uint256::zero());
 
     let verifier = WITHDRAW_VERIFIER.load(deps.storage)?;
@@ -376,7 +377,7 @@ pub fn execute_withdraw(
 
     // Get all locked balances
     let locked_balances = MAP_ADDR_TO_LOCKED_BALANCES
-        .may_load(deps.storage, info.sender.clone())?
+        .may_load(deps.storage, burner_addr.clone())?
         .unwrap_or_default();
 
     // Send all locked balances to withdraw address
@@ -408,7 +409,9 @@ pub fn execute_withdraw(
     Ok(Response::default()
         .add_messages(msgs)
         .add_attribute("action", "withdraw")
-        .add_attribute("from", info.sender))
+        .add_attribute("from", info.sender)
+        .add_attribute("to", withdraw_addr)
+        .add_attribute("burner", burner_addr))
 }
 
 pub fn execute_update_allowed_pools(
