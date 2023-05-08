@@ -16,14 +16,15 @@ The contract fails if:
 4. Contract loses user's funds
 
 Vectors of failure:
-* SNARK verification. Each verifier has different risks associated
-* Ownership hash tampering  
-* Pool whitelisting and updates
-* Withdrawals (is it correct to source)
 
-# Future Optimizations
+- SNARK verification. Each verifier has different risks associated
+- Ownership hash tampering
+- Pool whitelisting and updates
+- Withdrawals (is it correct to source)
 
-- Pool allowance list should be a Map
+# Future Work
+
 - Output denom should be inferred from the passed in routes
 - Will Osmosis support CW-20s?
-- Bigger root history size  
+- Bigger root history size
+- Handle any string for wallet address input

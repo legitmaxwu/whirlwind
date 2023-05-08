@@ -20,7 +20,6 @@ pub struct InstantiateMsg {
 
     pub vk_deposit: String,
     pub vk_swap_deposit: String,
-    pub vk_swap: String,
     pub vk_withdraw: String,
 }
 
@@ -28,27 +27,24 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     Deposit {
         proof: CircomProof,
-        deposit_credential_hash: String,
+        credential: String,
         withdraw_addr: String,
     },
     MigrateDeposit {
         proof: CircomProof,
         root: String,
         nullifier_hash: String,
-        deposit_credential_hash: String,
     },
     Swap {
-        proof: CircomProof,
-        deposit_credential_hash: String,
-        new_deposit_credential_hash: String,
         routes: Vec<OsmosisRoute>,
-        min_output: Uint128,
+        input_amount: Uint128,
+        input_denom: DenomUnvalidated,
+        min_output_amount: Uint128,
         output_denom: DenomUnvalidated,
     },
     Withdraw {
         proof: CircomProof,
         withdraw_addr: String,
-        deposit_credential_hash: String,
     },
     UpdateAllowedPools {
         pools: Vec<String>,

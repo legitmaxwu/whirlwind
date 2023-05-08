@@ -31,4 +31,7 @@ pub enum ContractError {
 
     #[error("Invalid pool ID")]
     InvalidPoolId { id: String },
+
+    #[error("Insufficient funds in locked balance")]
+    InsufficientLockedBalance {},
 }
