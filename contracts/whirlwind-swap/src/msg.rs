@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Uint128, Coin};
+use cosmwasm_std::{Coin, Uint128};
 use lib::msg::CircomProof;
 
 use crate::state::Denom;
@@ -15,7 +15,7 @@ pub struct InstantiateMsg {
     pub amount: Uint128,
     pub denom: DenomUnvalidated,
 
-    pub pool_admin: Option<String>, 
+    pub pool_admin: Option<String>,
     pub allowed_pools: Vec<String>,
 
     pub vk_deposit: String,
@@ -27,26 +27,32 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     Deposit {
-        proof: String,
+        proof: CircomProof,
         deposit_credential: String,
         withdraw_addr: String,
     },
     MigrateDeposit {
         proof: CircomProof,
-
-        root: String, 
+        root: String,
         nullifier_hash: String,
         deposit_credential_hash: String,
     },
     Swap {
+        proof: CircomProof,
+        deposit_credential_hash: String,
+        new_deposit_credential_hash: String,
         routes: Vec<OsmosisRoute>,
-        input_amount: Uint128,
+        min_output: Uint128,
         output_denom: DenomUnvalidated,
     },
-    Withdraw {},
+    Withdraw {
+        proof: CircomProof,
+        withdraw_addr: String,
+        deposit_credential_hash: String,
+    },
     UpdateAllowedPools {
         pools: Vec<String>,
-    }
+    },
 }
 
 #[cw_serde]
@@ -64,7 +70,6 @@ pub enum QueryMsg {
     GetOwnership { deposit_credential_hash: String },
 }
 
-
 // MARK: Osmosis Messages
 
 #[cw_serde]
@@ -78,12 +83,12 @@ pub struct OsmosisSwapValue {
     pub routes: Vec<OsmosisRoute>,
     pub sender: String,
     pub token_in: Coin,
-    pub token_out_min_amount: Uint128, 
+    pub token_out_min_amount: Uint128,
 }
 
 #[cw_serde]
 pub struct OsmosisSwap {
     #[serde(rename = "type")]
     pub _type: String,
-    pub value: OsmosisSwapValue, 
+    pub value: OsmosisSwapValue,
 }

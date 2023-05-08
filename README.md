@@ -26,3 +26,4 @@ Vectors of failure:
 - Pool allowance list should be a Map
 - Output denom should be inferred from the passed in routes
 - Will Osmosis support CW-20s?
+- Bigger root history size  
