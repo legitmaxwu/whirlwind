@@ -41,5 +41,5 @@ template Swap(levels) {
 }
 
 component main {
-    public [depositTreeRoot, pathElements, pathIndices, depositNullifier, nftCredential]
+    public [depositTreeRoot, depositNullifier, nftCredential]
 } = Swap(20);
