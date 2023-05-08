@@ -8,23 +8,26 @@
 <br/>
 <br/>
 <br/>
-
-## Overview
-
-<p align="center">
-	<img src="/images/whirlwind-logo.png" width="100%"/>
-</p>
-
-1. User deposits funds from main wallet into Whirlwind via an anonymity pool.
-2. They can now swap privately using a burner wallet. (Link between wallets is hidden from public)
-3. Once the user is done swapping, they may withdraw funds back to the main wallet. (At this stage the link between wallets is revealed)
-
+  
 ## Project Structure
 
 - `contracts`: CosmWasm contracts
 - `circuits`: Circom circuits, script for building proving/verification keys
 - `generate-data`: Generate data for SNARK proofs
 - `generate-proofs`: Generate SNARK proofs
+
+## Overview
+
+Whirlwind allows for temporarily private trades on Osmosis until withdrawal.
+
+### Using Whirlwind
+1. User deposits funds from main wallet into Whirlwind via an anonymity pool.
+2. They can now swap privately using a burner wallet. (Link between wallets is hidden from public)
+3. Once the user is done swapping, they may withdraw funds back to the main wallet. (At this stage the link between wallets is revealed)
+
+<p align="center">
+	<img src="/images/diagram.png" width="100%"/>
+</p>
 
 ## Security
 
