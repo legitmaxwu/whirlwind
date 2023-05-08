@@ -39,7 +39,7 @@ pub const MAP_ADDR_TO_LOCKED_BALANCES: Map<Addr, Vec<AmountDenom>> = Map::new("m
 
 #[cw_serde]
 pub struct SwapContext {
-    pub swapperAddr: Addr,
+    pub swapper_addr: Addr,
     pub output_balance_before_swap: Uint128,
     pub output_denom: Denom,
 }
