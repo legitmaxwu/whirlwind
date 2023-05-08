@@ -14,12 +14,6 @@ type GrothBn = Groth16<Bn254>;
 
 use cosmwasm_std::Uint256;
 
-// pub fn calculate_merkle_path(
-//     root: Uint256,
-//     leaf: Uint256,
-//     path: Vec<Uint256>
-// ) -> 
-
 fn U256(value: &str) -> Uint256 {
     Uint256::from_str(value).unwrap()
 }
