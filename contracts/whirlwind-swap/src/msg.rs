@@ -45,6 +45,7 @@ pub enum ExecuteMsg {
     Withdraw {
         proof: CircomProof,
         withdraw_addr: String,
+        burner_addr: String
     },
     UpdateAllowedPools {
         pools: Vec<String>,
