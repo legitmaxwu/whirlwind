@@ -4,14 +4,15 @@ export type CryptoBalance = {
   quantity: number;
 };
 
-export enum PropositionStatus {
+export enum ProposalStatus {
   Pending = "Pending",
   Executed = "Executed",
   Rejected = "Rejected",
 }
-export type Proposition = {
+
+export type Proposal = {
   id: string;
-  status: PropositionStatus;
+  status: ProposalStatus;
   title: string;
   createdAt: Date;
 };
