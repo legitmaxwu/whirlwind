@@ -1,6 +1,7 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import { BalancesTable } from "../components/BalancesTable";
 
 const SwapPage: NextPage = () => {
   return (
@@ -10,7 +11,9 @@ const SwapPage: NextPage = () => {
         <meta name="description" content="Tax-compliant zk-private trades" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div></div>
+      <div>
+        <BalancesTable />
+      </div>
     </>
   );
 };
