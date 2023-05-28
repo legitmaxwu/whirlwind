@@ -4,7 +4,6 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "./DataTable";
 import { type CryptoBalance } from "../types";
 import { type Asset } from "@chain-registry/types";
-import { useMemo } from "react";
 import {
   CRYPTO_BALANCES,
   CRYPTO_LISTINGS,
@@ -12,6 +11,7 @@ import {
 } from "../lib/constants";
 import { assets } from "chain-registry";
 import Image from "next/image";
+import { formatNumber } from "../lib/utils";
 
 type BalanceRow = CryptoBalance & {
   asset: Asset | undefined;
@@ -38,10 +38,42 @@ export const columns: ColumnDef<BalanceRow>[] = [
   {
     header: "Price",
     accessorKey: "listing.quote.USD.price",
+    cell({ row }) {
+      return (
+        <div className="flex items-center gap-2">
+          <div>
+            {Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(row.original.listing?.quote.USD.price ?? 0)}
+          </div>
+          <div className="text-green-600">
+            {formatNumber(
+              row.original.listing?.quote.USD.percent_change_24h ?? 0
+            ) ?? 0}
+            % (24h)
+          </div>
+        </div>
+      );
+    },
   },
   {
-    header: "Amount",
-    accessorKey: "quantity",
+    header: "Quantity",
+    cell({ row }) {
+      return (
+        <div>
+          {Intl.NumberFormat("en-US", {}).format(row.original.quantity ?? 0)}
+        </div>
+      );
+    },
+  },
+  {
+    header: "Value",
+    cell({ row }) {
+      const quantity = row.original.quantity ?? 0;
+      const price = row.original.listing?.quote.USD.price ?? 0;
+      return <div>${formatNumber(price * quantity)}</div>;
+    },
   },
 ];
 
@@ -73,9 +105,5 @@ const balanceRows: BalanceRow[] = CRYPTO_BALANCES.map((balance) => {
 });
 
 export function BalancesTable() {
-  return (
-    <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={balanceRows} />
-    </div>
-  );
+  return <DataTable columns={columns} data={balanceRows} />;
 }

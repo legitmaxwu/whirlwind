@@ -48,7 +48,7 @@ const proposalRows: ProposalRow[] = [
     id: nanoid(),
     title: "Migrate 125K to Max Wu’s Burner Wallet",
     status: ProposalStatus.Pending,
-    createdAt: new Date(),
+    createdAt: new Date("Mar 2023"),
   },
   {
     id: nanoid(),

@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.0.3",
     "@t3-oss/env-nextjs": "^0.3.1",
     "@tanstack/react-table": "^8.9.1",
     "chain-registry": "^1.14.0",
@@ -17,6 +18,7 @@
     "lucide-react": "^0.221.0",
     "nanoid": "^4.0.2",
     "next": "^13.4.2",
+    "numeral": "^2.0.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwind-merge": "^1.12.0",
@@ -27,6 +29,7 @@
     "@chain-registry/types": "^0.16.0",
     "@types/eslint": "^8.37.0",
     "@types/node": "^18.16.0",
+    "@types/numeral": "^2.0.2",
     "@types/prettier": "^2.7.2",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
