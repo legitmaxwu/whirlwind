@@ -5,12 +5,17 @@ import { DataTable } from "./DataTable";
 import { type CryptoBalance } from "../types";
 import { type Asset } from "@chain-registry/types";
 import { useMemo } from "react";
-import { CRYPTO_BALANCES } from "../lib/constants";
+import {
+  CRYPTO_BALANCES,
+  CRYPTO_LISTINGS,
+  type CryptoListing,
+} from "../lib/constants";
 import { assets } from "chain-registry";
 import Image from "next/image";
 
 type BalanceRow = CryptoBalance & {
   asset: Asset | undefined;
+  listing: CryptoListing | undefined;
 };
 
 export const columns: ColumnDef<BalanceRow>[] = [
@@ -31,6 +36,10 @@ export const columns: ColumnDef<BalanceRow>[] = [
     },
   },
   {
+    header: "Price",
+    accessorKey: "listing.quote.USD.price",
+  },
+  {
     header: "Amount",
     accessorKey: "quantity",
   },
@@ -48,10 +57,20 @@ function findAssetWithDenom(denom: string) {
   return asset;
 }
 
-const balanceRows: BalanceRow[] = CRYPTO_BALANCES.map((balance) => ({
-  ...balance,
-  asset: findAssetWithDenom(balance.denom),
-}));
+function findListingWithSymbol(symbol: string) {
+  return CRYPTO_LISTINGS.find((listing) => listing.symbol === symbol);
+}
+
+const balanceRows: BalanceRow[] = CRYPTO_BALANCES.map((balance) => {
+  const asset = findAssetWithDenom(balance.denom);
+  const listing = findListingWithSymbol(asset?.symbol ?? "");
+
+  return {
+    ...balance,
+    asset,
+    listing,
+  };
+});
 
 export function BalancesTable() {
   return (
