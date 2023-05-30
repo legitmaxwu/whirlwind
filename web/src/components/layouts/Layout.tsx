@@ -35,8 +35,8 @@ function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
           key={href}
           href={href}
           className={cn({
-            "text-sm font-medium transition-colors hover:text-primary": true,
-            "text-muted-foreground": router.pathname !== href,
+            "text-sm font-medium transition-opacity hover:opacity-100": true,  
+            "opacity-40": router.pathname !== href,
           })}
         >
           {label}
@@ -54,7 +54,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Image
             src="/whirlwind-logo-black.png"
             alt="Whirlwind Logo"
-            width={150}
+            width={120}
             height={1}
             // className="flex-1"
           />
