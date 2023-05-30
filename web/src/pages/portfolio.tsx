@@ -34,11 +34,11 @@ function DisplayDollarAmount({
 
 const ActivityItem = ({ name, text }: { name: string; text: string }) => {
   return (
-    <div className="flex gap-2 py-2 items-center">
-      <div className="h-6 w-6 rounded-full bg-black shrink-0 pr-2" />
+    <div className="flex items-center gap-2 py-2">
+      <div className="h-6 w-6 shrink-0 rounded-full bg-black pr-2" />
       <p>
         <span className="font-medium">{`${name} `}</span>
-        <span>{text}</span>
+        <span className="text-text-1">{text}</span>
       </p>
     </div>
   );
@@ -79,21 +79,21 @@ const PortfolioPage: NextPage = () => {
   }, [controllerAccounts]);
 
   return (
-    <>
+    <div>
       <Head>
         <title>Whirlwind - Portfolio</title>
         <meta name="description" content="Tax-compliant zk-private trades" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="flex justify-between pb-2 pt-4">
+      <div className="-mx-4 my-8 flex justify-between rounded-xl border border-highlight bg-white px-4 py-2">
         <div className="py-2 text-lg font-medium">
           {Constants.InstitutionName}
         </div>
         <MembersView />
       </div>
       <div>
-        <div className="flex gap-8">
-          <div className="flex flex-1 flex-col gap-8">
+        <div className="flex gap-4">
+          <div className="flex flex-1 flex-col gap-8 rounded-lg border border-highlight bg-white px-8 py-6">
             <div className="flex gap-12">
               <DisplayDollarAmount
                 title="Total Assets"
@@ -115,8 +115,8 @@ const PortfolioPage: NextPage = () => {
           </div>
 
           {/* Activity Section */}
-          <div className="px-4 max-w-xs text-sm shrink-0">
-            <h1 className="font-medium text-lg pb-2">Activity</h1>
+          <div className="max-w-xs shrink-0 rounded-lg border border-highlight bg-white px-6 py-6 text-sm">
+            <h1 className="text-lg font-medium">Activity</h1>
             <ActivityItem
               name="Max Wu"
               text="swapped 250K USDC for 189.48K OSMO"
@@ -140,8 +140,9 @@ const PortfolioPage: NextPage = () => {
           </div>
         </div>
 
-        <div className="h-8"></div>
-        <div>
+        <div className="h-4" />
+
+        <div className="rounded-lg border border-highlight bg-white px-8 py-6">
           <div className="text-xl font-medium">
             Whirlwind Controller Accounts
           </div>
@@ -179,13 +180,17 @@ const PortfolioPage: NextPage = () => {
             })}
           </div>
         </div>
-        <div className="h-8"></div>
-        <div className="text-xl font-medium">Holdings</div>
-        <div className="h-2"></div>
-        <BalancesTable balanceRows={enrichedBalances} />
+        <div className="h-4" />
+        <div className="rounded-lg border border-highlight bg-white px-8 py-6">
+          <div className="text-xl font-medium">Holdings</div>
+          <div className="h-2"></div>
+          <BalancesTable balanceRows={enrichedBalances} />
+
+          <div className="h-4" />
+        </div>
+        <div className="h-16" />
       </div>
-      <div className="h-24"></div>
-    </>
+    </div>
   );
 };
 
