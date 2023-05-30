@@ -6,7 +6,7 @@ import { type CryptoBalance } from "../types";
 import { type Asset } from "@chain-registry/types";
 import { CRYPTO_LISTINGS, type CryptoListing } from "../lib/constants";
 import Image from "next/image";
-import { formatNumber } from "../lib/utils";
+import { cn, formatDelta, formatNumber } from "../lib/utils";
 import { useAtom } from "jotai";
 import { totalBalancesAtom } from "../jotai/balances";
 import { enrichBalancesArray } from "../lib/prices";
@@ -38,6 +38,9 @@ export const columns: ColumnDef<BalanceRow>[] = [
     header: "Price",
     accessorKey: "listing.quote.USD.price",
     cell({ row }) {
+      const percentChange24h =
+        row.original.listing?.quote.USD.percent_change_24h ?? 0;
+      const up = percentChange24h > 0;
       return (
         <div className="flex items-center gap-2">
           <div>
@@ -46,11 +49,13 @@ export const columns: ColumnDef<BalanceRow>[] = [
               currency: "USD",
             }).format(row.original.listing?.quote.USD.price ?? 0)}
           </div>
-          <div className="text-green-600">
-            {formatNumber(
-              row.original.listing?.quote.USD.percent_change_24h ?? 0
-            ) ?? 0}
-            % (24h)
+          <div
+            className={cn({
+              "text-green-500": up,
+              "text-red-500": !up,
+            })}
+          >
+            {formatDelta(percentChange24h)}% (24h)
           </div>
         </div>
       );

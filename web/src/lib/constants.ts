@@ -29,25 +29,27 @@ function calculateHistory(
   endTime: Date,
   interval: number
 ): DataPoint[] {
-  const drift = 1; // mean
-  const volatility = 50; // standard deviation
   const totalSteps = Math.floor(
     (endTime.getTime() - startTime.getTime()) / interval
   );
-  const result: DataPoint[] = [
-    { date: new Date(startTime), balance: initialValue },
-  ];
   const stepValue = (finalValue - initialValue) / totalSteps;
 
-  for (let i = 0; i < totalSteps; i++) {
-    const time = new Date(startTime.getTime() + i * interval);
+  const drift = 1; // mean
+  const volatility = 25; // standard deviation
+
+  const result: DataPoint[] = [
+    { date: new Date(endTime), balance: finalValue },
+  ];
+
+  for (let i = 1; i <= totalSteps; i++) {
+    const time = new Date(endTime.getTime() - i * interval);
     const random = Math.random();
     const changePercent = drift + volatility * (random - 0.5); // applying noise to the change percent
 
     const balance = Math.abs(
-      (result[i]?.balance ?? 0) + stepValue * changePercent
+      (result[0]?.balance ?? 0) - stepValue * changePercent
     );
-    result.push({ date: time, balance: balance });
+    result.unshift({ date: time, balance: balance });
   }
 
   return result;
@@ -81,6 +83,7 @@ type ControllerAccount = {
   balances: CryptoBalance[];
   assignedTo: string;
   history: DataPoint[];
+  walletAddress: string;
 };
 
 function getBalancesAndHistory(balances: CryptoBalance[], growth3M: number) {
@@ -109,10 +112,14 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
         { denom: "osmo", quantity: 1337 },
         { denom: "atom", quantity: 420 },
         { denom: "axl", quantity: 500 },
+        { denom: "cro", quantity: 7125 },
+        { denom: "scrt", quantity: 700 },
+        { denom: "akt", quantity: 50120 },
       ],
       3.5
     ),
     assignedTo: "Bao Mai",
+    walletAddress: "osmo1xv9tklw7d82sezh9haa573wufgy59vmwe6xxe5",
   },
   {
     id: nanoid(),
@@ -126,6 +133,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
       1.7
     ),
     assignedTo: "Longevity Fund II",
+    walletAddress: "osmo1asfbabflw7d82sezh9haa573wufgy59vmwe6xxe5",
   },
   {
     id: nanoid(),
@@ -138,6 +146,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
       1.2
     ),
     assignedTo: "Longevity Fund II",
+    walletAddress: "osmo1f009f09r1282sezh9haa573wufgy59vmwe6xxe5",
   },
   {
     id: nanoid(),
@@ -150,6 +159,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
       1.1
     ),
     assignedTo: "Longevity Fund II",
+    walletAddress: "osmo1fasopaflw7pmvezh9haa573wufgy59vmwe6xxe5",
   },
 ];
 

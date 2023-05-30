@@ -23,3 +23,11 @@ export function formatNumber(n: number): string {
     return numeral(n).format("0,0.00");
   }
 }
+
+export function formatDelta(delta: number) {
+  if (delta > 0) {
+    return "+" + formatNumber(delta);
+  } else {
+    return formatNumber(delta);
+  }
+}

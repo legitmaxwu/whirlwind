@@ -6,9 +6,19 @@ import { useAtom } from "jotai";
 import { controllerAccountsAtom } from "../../jotai/balances";
 import { type CustomPage } from "../../types/Page";
 import { SwapLayout } from "../../components/layouts/SwapLayout";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { handleError } from "../../lib/handleError";
 
 const SwapPage: CustomPage = () => {
   const [controllerAccounts] = useAtom(controllerAccountsAtom);
+  const router = useRouter();
+  useEffect(() => {
+    const acctId = controllerAccounts[0]?.id;
+    if (acctId) {
+      router.replace(`/swap/${acctId}`).catch(handleError);
+    }
+  }, [controllerAccounts, router]);
   return (
     <>
       <Head>

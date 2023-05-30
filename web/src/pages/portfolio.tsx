@@ -33,7 +33,6 @@ const PortfolioPage: NextPage = () => {
     () => enrichBalancesArray(totalBalances),
     [totalBalances]
   );
-  console.log(enrichedBalances);
   const totalAssetsValue = totalUSDValue(enrichedBalances);
   const [controllerAccounts] = useAtom(controllerAccountsAtom);
 

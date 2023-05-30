@@ -9,23 +9,33 @@ import { enrichBalancesArray, totalUSDValue } from "../../lib/prices";
 import { Card, CardTitle } from "../ui/card";
 
 export function SwapLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [controllerAccounts] = useAtom(controllerAccountsAtom);
+
+  const accountId = router.query.accountId as string;
 
   return (
     <div className="flex w-full">
-      <div className="flex flex-col gap-2 py-8">
+      <div className="flex flex-col gap-4 py-8">
         {controllerAccounts.map((account) => {
+          const selected = account.id === accountId;
           const enrichedAccountBalances = enrichBalancesArray(account.balances);
           return (
             <Link key={account.id} href={`/swap/${account.id}`}>
-              <Card role="button" className="p-4 text-right">
-                <CardTitle className="text-lg font-medium">
+              <button
+                className={cn({
+                  "w-48 text-right": true,
+                  "text-primary": selected,
+                  "text-gray-400": !selected,
+                })}
+              >
+                <div className="truncate text-lg font-medium">
                   {account.accountTitle}
-                </CardTitle>
-                <div className="text-md font-medium text-muted-foreground">
+                </div>
+                <div className="text-md">
                   {`$${formatNumber(totalUSDValue(enrichedAccountBalances))}`}
                 </div>
-              </Card>
+              </button>
             </Link>
           );
         })}
