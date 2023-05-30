@@ -63,7 +63,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="h-7 w-7 rounded-full bg-gray-400"></div>
         </div>
       </div>
-      <div className="mx-auto max-w-6xl">{children}</div>
+      <div className="bg-bg-1">
+        <div className="mx-auto max-w-6xl">{children}</div>
+      </div>
     </div>
   );
 }
