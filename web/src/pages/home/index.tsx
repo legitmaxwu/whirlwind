@@ -17,9 +17,12 @@ import {
 import { MembersView } from "../../components/MembersView";
 import dynamic from "next/dynamic";
 
-const DynamicLineChart = dynamic(() => import("../../components/LineChart"), {
-  ssr: false,
-});
+const DynamicStackedLineChart = dynamic(
+  () => import("../../components/StackedLineChart"),
+  {
+    ssr: false,
+  }
+);
 
 function DisplayDollarAmount({
   title,
@@ -104,7 +107,13 @@ const PortfolioPage: NextPage = () => {
                 amountString={`$${formatNumber(Constants.TradeVolume)}`}
               />
             </div>
-            <DynamicLineChart data={mergedHistory} />
+            <DynamicStackedLineChart
+              data={mergedHistory.map((bal) => ({
+                date: bal.date,
+                balanceTop: bal.balance,
+                balanceBottom: 10000,
+              }))}
+            />
           </div>
           <div className="flex-1 border">ACTIVITY</div>
         </div>

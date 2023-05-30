@@ -17,6 +17,7 @@
     "@visx/grid": "^3.0.1",
     "@visx/scale": "^3.0.0",
     "@visx/shape": "^3.0.0",
+    "@visx/xychart": "^3.1.2",
     "chain-registry": "^1.14.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
