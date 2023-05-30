@@ -1,6 +1,25 @@
 import { NextPage } from "next";
 import Head from "next/head";
 import { MembersView } from "./portfolio";
+import { fmtComma } from "./proposals";
+
+const TraderItem = ({
+  name,
+  usdcValue,
+}: {
+  name: string;
+  usdcValue: number;
+}) => {
+  return (
+    <div className="flex justify-between px-4 py-4 border-b border-b-highlight">
+      <div className="flex items-center gap-2">
+        <div className="h-6 w-6 rounded-full bg-black" />
+        <p className="font-medium">{name}</p>
+      </div>
+      <div className="font-medium">{`$${fmtComma(usdcValue, 2)}`}</div>
+    </div>
+  );
+};
 
 const TradersPage: NextPage = () => {
   return (
@@ -17,6 +36,16 @@ const TradersPage: NextPage = () => {
             BlackRock Osmosis Fund II
           </div>
           <MembersView />
+        </div>
+        <div className="max-w-xl">
+          <h1 className="text-2xl font-medium">People</h1>
+          <div className="flex flex-col rounded-lg border border-highlight my-4">
+            <TraderItem name={"Max Wu"} usdcValue={148453} />
+            <TraderItem name={"Luke Saunders"} usdcValue={715324} />
+            <TraderItem name={"Sunny Aggarwal"} usdcValue={943439} />
+            <TraderItem name={"Dev"} usdcValue={439949} />
+            <TraderItem name={"Bao Mai"} usdcValue={32430} />
+          </div>
         </div>
       </div>
     </>

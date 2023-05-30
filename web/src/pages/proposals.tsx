@@ -5,7 +5,7 @@ import { MembersView } from "./portfolio";
 
 export const fmtComma = (s: number, maximumFractionDigits?: number) =>
   s.toLocaleString("en", {
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
     maximumFractionDigits: maximumFractionDigits ?? 2,
   });
 
