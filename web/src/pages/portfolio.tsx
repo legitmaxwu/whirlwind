@@ -118,9 +118,9 @@ const PortfolioPage: NextPage = () => {
                 account.balances
               );
               return (
-                <Card key={account.id} className="p-4">
+                <Card key={account.id} className="flex-1 py-4 px-6">
                   <div>
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                    <CardTitle className="text-sm font-normal text-text-1">
                       {account.accountTitle}
                     </CardTitle>
                     <div className="text-2xl font-medium">
@@ -131,11 +131,11 @@ const PortfolioPage: NextPage = () => {
                   </div>
                   <div className="h-2"></div>
                   <div className="flex gap-2">
-                    <div className="h-6 w-6 rounded-full bg-gray-300"></div>
-                    <div className="text-xs font-medium text-muted-foreground">
+                    <div className="h-6 w-6 rounded-full bg-black border"></div>
+                    <div className="text-xs font-normal text-text-1">
                       Assigned to
                       <br />
-                      <span className="text-sm text-black">
+                      <span className="text-sm text-black font-medium">
                         {account.assignedTo}
                       </span>
                     </div>
