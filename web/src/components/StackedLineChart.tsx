@@ -8,7 +8,12 @@ import { cn } from "../lib/utils";
 
 const allKeys = ["1D", "1W", "1M", "3M", "1Y", "YTD"];
 
-type DataPoint = { date: Date; balanceTop: number; balanceBottom: number };
+type DataPoint = {
+  date: Date;
+  balanceTop: number;
+  balanceMiddle: number;
+  balanceBottom: number;
+};
 
 interface StackedLineChartProps {
   data: DataPoint[];
@@ -48,7 +53,7 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
     <div>
       <svg width={width} height={height}>
         <AxisBottom top={height - margin.bottom} scale={xScale} numTicks={10} />
-        <AxisLeft scale={yScale} left={margin.left} />
+        {/* <AxisLeft scale={yScale} left={margin.left} /> */}
         <AreaClosed
           data={data}
           x={(d) => xScale(d.date)}
@@ -56,6 +61,15 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
           yScale={yScale}
           stroke={"transparent"}
           fill={"blue"}
+          curve={curveBasis}
+        />
+        <AreaClosed
+          data={data}
+          x={(d) => xScale(d.date)}
+          y={(d) => yScale(d.balanceMiddle)}
+          yScale={yScale}
+          stroke={"transparent"}
+          fill={"green"}
           curve={curveBasis}
         />
         <AreaClosed

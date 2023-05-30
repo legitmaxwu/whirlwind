@@ -121,6 +121,7 @@ const PortfolioPage: NextPage = () => {
               data={mergedHistory.map((item) => ({
                 date: item.date,
                 balanceTop: item.balance,
+                balanceMiddle: 20000,
                 balanceBottom: 10000,
               }))}
             />
