@@ -16,7 +16,7 @@ const SwapPage: CustomPage = () => {
   useEffect(() => {
     const acctId = controllerAccounts[0]?.id;
     if (acctId) {
-      router.replace(`/swap/${acctId}`).catch(handleError);
+      router.replace(`/accounts/${acctId}`).catch(handleError);
     }
   }, [controllerAccounts, router]);
   return (
