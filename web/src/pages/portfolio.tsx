@@ -1,7 +1,7 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { Constants } from "../lib/constants";
+import { Constants, type DataPoint } from "../lib/constants";
 import Image from "next/image";
 import { Card, CardTitle } from "../components/ui/card";
 import numeral from "numeral";
@@ -12,6 +12,11 @@ import { useMemo } from "react";
 import { enrichBalancesArray, totalUSDValue } from "../lib/prices";
 import { controllerAccountsAtom, totalBalancesAtom } from "../jotai/balances";
 import { MembersView } from "../components/MembersView";
+import dynamic from "next/dynamic";
+
+const DynamicLineChart = dynamic(() => import("../components/LineChart"), {
+  ssr: false,
+});
 
 function DisplayDollarAmount({
   title,
@@ -35,6 +40,31 @@ const PortfolioPage: NextPage = () => {
   );
   const totalAssetsValue = totalUSDValue(enrichedBalances);
   const [controllerAccounts] = useAtom(controllerAccountsAtom);
+
+  const mergedHistory = useMemo(() => {
+    const histories = controllerAccounts.map((account) => account.history);
+    const firstHistory = histories[0];
+    if (!firstHistory) {
+      return [];
+    }
+    const newHistoryObj: DataPoint[] = [];
+    for (let i = 0; i < firstHistory.length; i++) {
+      const firstHistoryItem = firstHistory[i];
+      if (!firstHistoryItem) {
+        continue;
+      } else {
+        const allBalances = histories.map(
+          (history) => history[i]?.balance ?? 0
+        );
+        const totalBalance = allBalances.reduce((a, b) => a + b, 0);
+        newHistoryObj.push({
+          date: firstHistoryItem.date,
+          balance: totalBalance,
+        });
+      }
+    }
+    return newHistoryObj;
+  }, [controllerAccounts]);
 
   return (
     <>
@@ -71,7 +101,7 @@ const PortfolioPage: NextPage = () => {
                 amountString={`$${formatNumber(Constants.TradeVolume)}`}
               />
             </div>
-            <div className="h-96 border">GRAPH</div>
+            <DynamicLineChart data={mergedHistory} />
           </div>
           <div className="flex-1 border">ACTIVITY</div>
         </div>

@@ -130,7 +130,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
         { denom: "atom", quantity: 1251 },
         { denom: "axl", quantity: 50110 },
       ],
-      1.7
+      11.7
     ),
     assignedTo: "Longevity Fund II",
     walletAddress: "osmo1asfbabflw7d82sezh9haa573wufgy59vmwe6xxe5",
@@ -143,7 +143,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
         { denom: "osmo", quantity: 1 },
         { denom: "atom", quantity: 125 },
       ],
-      1.2
+      10.2
     ),
     assignedTo: "Longevity Fund II",
     walletAddress: "osmo1f009f09r1282sezh9haa573wufgy59vmwe6xxe5",
