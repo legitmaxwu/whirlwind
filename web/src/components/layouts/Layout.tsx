@@ -6,20 +6,16 @@ import { cn } from "~/lib/utils";
 
 const NAV_PAGES = [
   {
-    href: "/portfolio",
-    label: "Portfolio",
+    href: "/home",
+    label: "Home",
   },
   {
-    href: "/swap",
-    label: "Swap",
+    href: "/deposits",
+    label: "Deposits",
   },
   {
-    href: "/proposals",
-    label: "Proposals",
-  },
-  {
-    href: "/traders",
-    label: "Traders",
+    href: "/accounts",
+    label: "Accounts",
   },
 ];
 

@@ -21,7 +21,7 @@ const config = {
   redirects: async () => [
     {
       source: "/",
-      destination: "/portfolio",
+      destination: "/home",
       permanent: true,
     },
   ],

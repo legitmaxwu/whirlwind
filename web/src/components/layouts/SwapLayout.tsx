@@ -21,7 +21,7 @@ export function SwapLayout({ children }: { children: React.ReactNode }) {
           const selected = account.id === accountId;
           const enrichedAccountBalances = enrichBalancesArray(account.balances);
           return (
-            <Link key={account.id} href={`/swap/${account.id}`}>
+            <Link key={account.id} href={`/accounts/${account.id}`}>
               <button
                 className={cn({
                   "w-48 text-right": true,
