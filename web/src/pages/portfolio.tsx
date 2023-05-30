@@ -27,11 +27,14 @@ function DisplayDollarAmount({
 }) {
   return (
     <div className="">
-      <div className="whitespace-nowrap text-sm font-medium">{title}</div>
+      <div className="whitespace-nowrap text-sm font-normal text-text-1">
+        {title}
+      </div>
       <div className="text-3xl font-medium">{amountString}</div>
     </div>
   );
 }
+
 const PortfolioPage: NextPage = () => {
   const [totalBalances] = useAtom(totalBalancesAtom);
   const enrichedBalances = useMemo(
@@ -73,14 +76,12 @@ const PortfolioPage: NextPage = () => {
         <meta name="description" content="Tax-compliant zk-private trades" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="h-8"></div>
-      <div>
-        <div className="flex items-center justify-between">
-          <div className="text-2xl">{Constants.InstitutionName}</div>
-          <MembersView />
+      <div className="flex justify-between pt-4 pb-2">
+        <div className="py-2 text-lg font-medium">
+          {Constants.InstitutionName}
         </div>
+        <MembersView />
       </div>
-      <div className="h-8"></div>
       <div>
         <div className="flex gap-8">
           <div className="flex flex-1 flex-col gap-8">
@@ -112,13 +113,13 @@ const PortfolioPage: NextPage = () => {
             Whirlwind Controller Accounts
           </div>
           <div className="h-4"></div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             {controllerAccounts.map((account) => {
               const enrichedAccountBalances = enrichBalancesArray(
                 account.balances
               );
               return (
-                <Card key={account.id} className="flex-1 py-4 px-6">
+                <Card key={account.id} className="flex-1 px-6 py-4">
                   <div>
                     <CardTitle className="text-sm font-normal text-text-1">
                       {account.accountTitle}
@@ -131,11 +132,11 @@ const PortfolioPage: NextPage = () => {
                   </div>
                   <div className="h-2"></div>
                   <div className="flex gap-2">
-                    <div className="h-6 w-6 rounded-full bg-black border"></div>
+                    <div className="h-6 w-6 rounded-full border bg-black"></div>
                     <div className="text-xs font-normal text-text-1">
                       Assigned to
                       <br />
-                      <span className="text-sm text-black font-medium">
+                      <span className="text-sm font-medium text-black">
                         {account.assignedTo}
                       </span>
                     </div>
