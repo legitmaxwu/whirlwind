@@ -5,10 +5,6 @@ import { Constants } from "../lib/constants";
 export const controllerAccountsAtom = atom(Constants.ControllerAccounts);
 export const controllerAccountAtomsAtom = splitAtom(controllerAccountsAtom);
 
-// The selector atom, it gets an id and returns the object from the list with that id.
-export const selectControllerAccountAtom = (id: string) =>
-  atom((get) => get(controllerAccountsAtom).find((item) => item.id === id));
-
 export const totalBalancesAtom = atom((get) => {
   // Merge all controller accounts balances into a single array
   const controllerAccounts = get(controllerAccountsAtom);

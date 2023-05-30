@@ -76,12 +76,11 @@ export const columns: ColumnDef<BalanceRow>[] = [
   },
 ];
 
-export function BalancesTable() {
-  const [totalBalances] = useAtom(totalBalancesAtom);
-  const balanceRows: BalanceRow[] = useMemo(
-    () => enrichBalancesArray(totalBalances),
-    [totalBalances]
-  );
+interface BalancesTableProps {
+  balanceRows: BalanceRow[];
+}
+export function BalancesTable(props: BalancesTableProps) {
+  const { balanceRows } = props;
 
   return <DataTable columns={columns} data={balanceRows} />;
 }

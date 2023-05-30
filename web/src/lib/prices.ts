@@ -48,6 +48,5 @@ export function enrichBalancesArray(
 }
 
 export function totalUSDValue(balances: EnrichedBalance[]) {
-  console.log(balances);
   return balances.reduce((acc, balance) => acc + balance.valueUSD, 0);
 }

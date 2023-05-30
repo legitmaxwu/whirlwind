@@ -147,7 +147,7 @@ const PortfolioPage: NextPage = () => {
         <div className="h-8"></div>
         <div className="text-xl font-medium">Holdings</div>
         <div className="h-2"></div>
-        <BalancesTable />
+        <BalancesTable balanceRows={enrichedBalances} />
       </div>
       <div className="h-24"></div>
     </>

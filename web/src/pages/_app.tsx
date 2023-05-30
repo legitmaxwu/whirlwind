@@ -9,11 +9,9 @@ type CustomAppProps = AppProps & {
 };
 
 const MyApp: AppType = ({ Component, pageProps }: CustomAppProps) => {
-  return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
-  );
+  const getLayout = Component.getLayout || ((page) => page);
+
+  return <Layout>{getLayout(<Component {...pageProps} />)}</Layout>;
 };
 
 export default MyApp;
