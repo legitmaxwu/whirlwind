@@ -8,7 +8,8 @@ import { Card, CardTitle } from "../components/ui/card";
 import numeral from "numeral";
 import { formatNumber } from "../lib/utils";
 import { BalancesTable } from "../components/BalancesTable";
-function MembersView() {
+
+export function MembersView() {
   const firstThreeMembers = Constants.InstitutionMembers.slice(0, 3);
   // three overlapping avatars
   return (
@@ -17,12 +18,12 @@ function MembersView() {
         <Avatar
           className="flex flex-col items-center justify-center"
           key={member.id}
-          style={{ marginLeft: `-${index * 0.8}rem` }}
+          style={{ marginLeft: `-${index * 0.9}rem` }}
         >
           <AvatarImage
             src={member.profileImageSrc}
             alt={member.name}
-            className="h-8 w-8 rounded-full"
+            className="h-8 w-8 rounded-full border border-black"
             style={{
               position: "relative",
               zIndex: firstThreeMembers.length - index,
