@@ -15,6 +15,7 @@
     "chain-registry": "^1.14.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
+    "jotai": "^2.1.0",
     "lucide-react": "^0.221.0",
     "nanoid": "^4.0.2",
     "next": "^13.4.2",

@@ -8,6 +8,10 @@ import { Card, CardTitle } from "../components/ui/card";
 import numeral from "numeral";
 import { formatNumber } from "../lib/utils";
 import { BalancesTable } from "../components/BalancesTable";
+import { useAtom } from "jotai";
+import { useMemo } from "react";
+import { enrichBalancesArray, totalUSDValue } from "../lib/prices";
+import { controllerAccountsAtom, totalBalancesAtom } from "../jotai/balances";
 function MembersView() {
   const firstThreeMembers = Constants.InstitutionMembers.slice(0, 3);
   // three overlapping avatars
@@ -52,6 +56,15 @@ function DisplayDollarAmount({
   );
 }
 const PortfolioPage: NextPage = () => {
+  const [totalBalances] = useAtom(totalBalancesAtom);
+  const enrichedBalances = useMemo(
+    () => enrichBalancesArray(totalBalances),
+    [totalBalances]
+  );
+  console.log(enrichedBalances);
+  const totalAssetsValue = totalUSDValue(enrichedBalances);
+  const [controllerAccounts] = useAtom(controllerAccountsAtom);
+
   return (
     <>
       <Head>
@@ -80,7 +93,7 @@ const PortfolioPage: NextPage = () => {
               />
               <DisplayDollarAmount
                 title="Whirlwind Assets"
-                amountString={`$${formatNumber(Constants.WhirlwindAssets)}`}
+                amountString={`$${formatNumber(totalAssetsValue)}`}
               />
               <DisplayDollarAmount
                 title="Trade Volume"
@@ -99,29 +112,36 @@ const PortfolioPage: NextPage = () => {
           </div>
           <div className="h-4"></div>
           <div className="flex gap-4">
-            {Constants.ControllerAccounts.map((account) => (
-              <Card key={account.id} className="p-4">
-                <div>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {account.accountTitle}
-                  </CardTitle>
-                  <div className="text-2xl font-medium">
-                    ${formatNumber(account.balance)}
+            {controllerAccounts.map((account) => {
+              const enrichedAccountBalances = enrichBalancesArray(
+                account.balances
+              );
+              return (
+                <Card key={account.id} className="p-4">
+                  <div>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                      {account.accountTitle}
+                    </CardTitle>
+                    <div className="text-2xl font-medium">
+                      {`$${formatNumber(
+                        totalUSDValue(enrichedAccountBalances)
+                      )}`}
+                    </div>
                   </div>
-                </div>
-                <div className="h-2"></div>
-                <div className="flex gap-2">
-                  <div className="h-6 w-6 rounded-full bg-gray-300"></div>
-                  <div className="text-xs font-medium text-muted-foreground">
-                    Assigned to
-                    <br />
-                    <span className="text-sm text-black">
-                      {account.assignedTo}
-                    </span>
+                  <div className="h-2"></div>
+                  <div className="flex gap-2">
+                    <div className="h-6 w-6 rounded-full bg-gray-300"></div>
+                    <div className="text-xs font-medium text-muted-foreground">
+                      Assigned to
+                      <br />
+                      <span className="text-sm text-black">
+                        {account.assignedTo}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
         <div className="h-8"></div>

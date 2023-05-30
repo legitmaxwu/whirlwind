@@ -4,14 +4,13 @@ import { type ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "./DataTable";
 import { type CryptoBalance } from "../types";
 import { type Asset } from "@chain-registry/types";
-import {
-  CRYPTO_BALANCES,
-  CRYPTO_LISTINGS,
-  type CryptoListing,
-} from "../lib/constants";
-import { assets } from "chain-registry";
+import { CRYPTO_LISTINGS, type CryptoListing } from "../lib/constants";
 import Image from "next/image";
 import { formatNumber } from "../lib/utils";
+import { useAtom } from "jotai";
+import { totalBalancesAtom } from "../jotai/balances";
+import { enrichBalancesArray } from "../lib/prices";
+import { useMemo } from "react";
 
 type BalanceRow = CryptoBalance & {
   asset: Asset | undefined;
@@ -77,33 +76,12 @@ export const columns: ColumnDef<BalanceRow>[] = [
   },
 ];
 
-function findAssetWithDenom(denom: string) {
-  const list = assets.find((assetList) =>
-    assetList.assets.some((asset) =>
-      asset.denom_units.some((unit) => unit.denom === denom)
-    )
-  );
-  const asset = list?.assets.find((asset) =>
-    asset.denom_units.some((unit) => unit.denom === denom)
-  );
-  return asset;
-}
-
-function findListingWithSymbol(symbol: string) {
-  return CRYPTO_LISTINGS.find((listing) => listing.symbol === symbol);
-}
-
-const balanceRows: BalanceRow[] = CRYPTO_BALANCES.map((balance) => {
-  const asset = findAssetWithDenom(balance.denom);
-  const listing = findListingWithSymbol(asset?.symbol ?? "");
-
-  return {
-    ...balance,
-    asset,
-    listing,
-  };
-});
-
 export function BalancesTable() {
+  const [totalBalances] = useAtom(totalBalancesAtom);
+  const balanceRows: BalanceRow[] = useMemo(
+    () => enrichBalancesArray(totalBalances),
+    [totalBalances]
+  );
+
   return <DataTable columns={columns} data={balanceRows} />;
 }

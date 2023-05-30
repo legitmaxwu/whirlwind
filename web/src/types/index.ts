@@ -1,5 +1,4 @@
 export type CryptoBalance = {
-  id: string;
   denom: string;
   quantity: number;
 };

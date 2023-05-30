@@ -20,29 +20,52 @@ const INSTITUTION_MEMBERS = [
   },
 ] as const;
 
-const INSTITUTION_CONTROLLER_ACCOUNTS = [
+type ControllerAccount = {
+  id: string;
+  accountTitle: string;
+  balances: CryptoBalance[];
+  assignedTo: string;
+};
+
+const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
   {
     id: nanoid(),
     accountTitle: "MEV strategies",
-    balance: 140234,
+    balances: [
+      { denom: "osmo", quantity: 1337 },
+      { denom: "atom", quantity: 420 },
+      { denom: "axl", quantity: 500 },
+    ],
     assignedTo: "Bao Mai",
   },
   {
     id: nanoid(),
     accountTitle: "Longevity Fund II Multisig 1",
-    balance: 1424890,
+    balances: [
+      { denom: "osmo", quantity: 1337 },
+      { denom: "atom", quantity: 420 },
+      { denom: "axl", quantity: 500 },
+    ],
     assignedTo: "Longevity Fund II",
   },
   {
     id: nanoid(),
     accountTitle: "Longevity Fund II Multisig 2",
-    balance: 2437809,
+    balances: [
+      { denom: "osmo", quantity: 1337 },
+      { denom: "atom", quantity: 420 },
+      { denom: "axl", quantity: 500 },
+    ],
     assignedTo: "Longevity Fund II",
   },
   {
     id: nanoid(),
     accountTitle: "Longevity Fund II Multisig 3",
-    balance: 483900,
+    balances: [
+      { denom: "osmo", quantity: 1337 },
+      { denom: "atom", quantity: 420 },
+      { denom: "axl", quantity: 500 },
+    ],
     assignedTo: "Longevity Fund II",
   },
 ];
@@ -50,24 +73,10 @@ const INSTITUTION_CONTROLLER_ACCOUNTS = [
 export const Constants = {
   InstitutionName: "BlackRock Osmosis Fund II",
   TotalAssets: 32_307_834.95,
-  WhirlwindAssets: 5_123_000,
   TradeVolume: 78_000_000,
   InstitutionMembers: INSTITUTION_MEMBERS,
   ControllerAccounts: INSTITUTION_CONTROLLER_ACCOUNTS,
 };
-
-export const CRYPTO_BALANCES: CryptoBalance[] = [
-  {
-    id: nanoid(),
-    denom: "osmo",
-    quantity: 1_000_000_000,
-  },
-  {
-    id: nanoid(),
-    denom: "atom",
-    quantity: 2_000_000_000,
-  },
-];
 
 export const CRYPTO_LISTINGS = listingsJson.data;
 
