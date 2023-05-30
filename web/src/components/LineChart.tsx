@@ -60,8 +60,8 @@ export const LineChart: React.FC<LineChartProps> = ({ data }) => {
         ))}
       </div>
       <svg width={width} height={height}>
-        <GridRows scale={yScale} width={width} strokeDasharray="2,2" />
-        <GridColumns scale={xScale} height={height} strokeDasharray="2,2" />
+        {/* <GridRows scale={yScale} width={width} strokeDasharray="2,2" />
+        <GridColumns scale={xScale} height={height} strokeDasharray="2,2" /> */}
         <AxisBottom
           top={height - margin.bottom}
           scale={xScale}
@@ -74,7 +74,7 @@ export const LineChart: React.FC<LineChartProps> = ({ data }) => {
           y={(d) => yScale(d.balance)}
           stroke={"#000"}
           strokeWidth={2}
-          curve={curveBasis}
+          // curve={curveBasis}
         />
       </svg>
     </div>

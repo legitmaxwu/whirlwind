@@ -3,7 +3,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { Constants } from "../lib/constants";
 import Image from "next/image";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Card, CardTitle } from "../components/ui/card";
 import numeral from "numeral";
 import { formatNumber } from "../lib/utils";
@@ -12,34 +11,7 @@ import { useAtom } from "jotai";
 import { useMemo } from "react";
 import { enrichBalancesArray, totalUSDValue } from "../lib/prices";
 import { controllerAccountsAtom, totalBalancesAtom } from "../jotai/balances";
-function MembersView() {
-  const firstThreeMembers = Constants.InstitutionMembers.slice(0, 3);
-  // three overlapping avatars
-  return (
-    <div className="grid grid-cols-3">
-      {firstThreeMembers.map((member, index) => (
-        <Avatar
-          className="flex flex-col items-center justify-center"
-          key={member.id}
-          style={{ marginLeft: `-${index * 0.8}rem` }}
-        >
-          <AvatarImage
-            src={member.profileImageSrc}
-            alt={member.name}
-            className="h-8 w-8 rounded-full"
-            style={{
-              position: "relative",
-              zIndex: firstThreeMembers.length - index,
-            }}
-          />
-          <AvatarFallback>
-            {member.name.split(" ").map((name) => name[0]?.toUpperCase())}
-          </AvatarFallback>
-        </Avatar>
-      ))}
-    </div>
-  );
-}
+import { MembersView } from "../components/MembersView";
 
 function DisplayDollarAmount({
   title,

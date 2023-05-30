@@ -27,6 +27,7 @@ type ProposalRow = Proposal;
 export const columns: ColumnDef<ProposalRow>[] = [
   {
     header: "Status",
+
     cell({ row }) {
       return <RenderProposalStatus status={row.original.status} />;
     },
@@ -62,11 +63,23 @@ const proposalRows: ProposalRow[] = [
     status: ProposalStatus.Rejected,
     createdAt: new Date("Feb 2023"),
   },
+  {
+    id: nanoid(),
+    title: "Withdraw 200K from Max Wu's MEV Strategies",
+    status: ProposalStatus.Executed,
+    createdAt: new Date("Jan 12, 2023"),
+  },
+  {
+    id: nanoid(),
+    title: "Withdraw 150.4K from Max Wu's MEV Strategies",
+    status: ProposalStatus.Executed,
+    createdAt: new Date("Jan 08, 2023"),
+  },
 ];
 
 export function ProposalsTable() {
   return (
-    <div className="container mx-auto py-10">
+    <div className="py-4">
       <DataTable columns={columns} data={proposalRows} />
     </div>
   );
