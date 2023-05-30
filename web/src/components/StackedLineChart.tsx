@@ -20,9 +20,10 @@ interface StackedLineChartProps {
 }
 
 export default function StackedLineChart({ data }: StackedLineChartProps) {
-  const width = 790;
+  const width = 740;
   const height = 300;
   const margin = { top: 50, right: 0, bottom: 50, left: 0  };
+  const [sel, setSel] = useState(0);
 
   const xScale = useMemo(
     () =>
@@ -83,15 +84,13 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
         />
       </svg>
       <div>
-        {allKeys.map((key) => (
+        {allKeys.map((key, i) => (
           <button
             key={key}
-            onClick={() => {
-              // This is where you'd handle switching between different time intervals
-            }}
+            onClick={() => setSel(i)}
             className={cn({
-              "mx-1 font-medium text-primary": true,
-              "text-gray-400": !allKeys.includes(key),
+              "mx-1 font-medium text-sm transition-opacity hover:opacity-100": true,
+              "opacity-30": sel != i,
             })}
           >
             {key}
