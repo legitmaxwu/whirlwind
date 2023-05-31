@@ -18,6 +18,7 @@ import {
 import { MembersView } from "../../components/MembersView";
 import dynamic from "next/dynamic";
 import { fmtComma } from "../deposits";
+import { fmtName } from "~/lib/fmt";
 
 const DynamicStackedLineChart = dynamic(
   () => import("../../components/StackedLineChart"),
@@ -25,6 +26,14 @@ const DynamicStackedLineChart = dynamic(
     ssr: false,
   }
 );
+
+const WhirlwindAvatar = ({ name }: { name: string }) => {
+  return (
+    <div className="bg-bg-secondary flex h-8 w-8 items-center justify-center rounded-full border text-sm shrink-0">
+      {fmtName(name)}
+    </div>
+  );
+};
 
 function DisplayDollarAmount({
   title,
@@ -54,7 +63,7 @@ function DisplayDollarAmount({
 const ActivityItem = ({ name, text }: { name: string; text: string }) => {
   return (
     <div className="flex items-center gap-2 py-2">
-      <div className="h-6 w-6 shrink-0 rounded-full bg-black pr-2" />
+      <WhirlwindAvatar name={name}/>
       <p>
         <span className="font-medium">{`${name} `}</span>
         <span className="text-text-1">{text}</span>
@@ -205,7 +214,7 @@ const PortfolioPage: NextPage = () => {
                   </div>
                   <div className="h-2"></div>
                   <div className="flex gap-2">
-                    <div className="h-6 w-6 rounded-full border bg-black"></div>
+                    <WhirlwindAvatar name={account.assignedTo} />
                     <div className="text-xs font-normal text-text-1">
                       Assigned to
                       <br />

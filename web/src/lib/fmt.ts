@@ -8,3 +8,5 @@ export const fmtComma = (s: number, maximumFractionDigits?: number) =>
   });
 
 export const fromMicroDenom = (s: string) => Number(s) / 1e6;
+
+export const fmtName = (s: string) => s.split(' ').map(o => o.toUpperCase()).join('').slice(0, 2)
