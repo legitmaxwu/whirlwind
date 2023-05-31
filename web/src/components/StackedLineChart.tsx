@@ -22,7 +22,7 @@ interface StackedLineChartProps {
 export default function StackedLineChart({ data }: StackedLineChartProps) {
   const width = 740;
   const height = 300;
-  const margin = { top: 50, right: 0, bottom: 50, left: 0  };
+  const margin = { top: 50, right: 0, bottom: 50, left: 0 };
   const [sel, setSel] = useState(0);
 
   const xScale = useMemo(
@@ -61,7 +61,7 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
           y={(d) => yScale(d.balanceTop)}
           yScale={yScale}
           stroke={"transparent"}
-          fill={"blue"}
+          fill={"#c8b1e4"}
           curve={curveBasis}
         />
         <AreaClosed
@@ -70,7 +70,7 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
           y={(d) => yScale(d.balanceMiddle)}
           yScale={yScale}
           stroke={"transparent"}
-          fill={"green"}
+          fill={"#9b72cf"}
           curve={curveBasis}
         />
         <AreaClosed
@@ -79,7 +79,7 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
           y={(d) => yScale(d.balanceBottom)}
           yScale={yScale}
           stroke={"transparent"}
-          fill={"red"}
+          fill={"#532b88"}
           curve={curveBasis}
         />
       </svg>
@@ -89,7 +89,8 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
             key={key}
             onClick={() => setSel(i)}
             className={cn({
-              "mx-1 font-medium text-sm transition-opacity hover:opacity-100": true,
+              "mx-1 text-sm font-medium transition-opacity hover:opacity-100":
+                true,
               "opacity-30": sel != i,
             })}
           >

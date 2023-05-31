@@ -122,22 +122,25 @@ const PortfolioPage: NextPage = () => {
               </div>
               <DisplayDollarAmount
                 title="Whirlwind Deposited Assets"
-                color="red"
-                amountString={`$${formatNumber(totalAssetsValue)}`}
+                color="#9b72cf"
+                amountString={`$${formatNumber(50000)}`}
               />
               <DisplayDollarAmount
                 title="Whirlwind Migrated Assets"
-                color="green"
-                amountString={`$${formatNumber(Constants.TradeVolume)}`}
+                color="#532b88"
+                amountString={`$${formatNumber(totalAssetsValue)}`}
               />
             </div>
             <DynamicStackedLineChart
-              data={mergedHistory.map((item) => ({
-                date: item.date,
-                balanceTop: item.balance,
-                balanceMiddle: 20000,
-                balanceBottom: 10000,
-              }))}
+              data={mergedHistory.map((item, idx) => {
+                const pastHalfway = idx > mergedHistory.length / 2;
+                return {
+                  date: item.date,
+                  balanceTop: item.balance + 100000,
+                  balanceMiddle: item.balance + (pastHalfway ? 50000 : 22000),
+                  balanceBottom: item.balance,
+                };
+              })}
             />
           </div>
 

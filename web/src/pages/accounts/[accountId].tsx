@@ -269,15 +269,15 @@ const SwapAccountPage: CustomPage = () => {
               <p>$0.00</p>
             </div>
             <div>
-            <SwapInfoDropdown
-              inputAmount={324}
-              outputAmount={459.49}
-              minOutput={420.34}
-              slippage={0.01}
-              token0={token0}
-              token1={token1}
-              tokenRatioSimple="3"
-            />
+              <SwapInfoDropdown
+                inputAmount={324}
+                outputAmount={459.49}
+                minOutput={420.34}
+                slippage={0.01}
+                token0={token0}
+                token1={token1}
+                tokenRatioSimple="3"
+              />
             </div>
           </div>
         </div>
