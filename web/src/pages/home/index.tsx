@@ -13,6 +13,7 @@ import {
 } from "../../jotai/balances";
 import { MembersView } from "../../components/MembersView";
 import dynamic from "next/dynamic";
+import { fmtComma } from "../deposits";
 
 const DynamicStackedLineChart = dynamic(
   () => import("../../components/StackedLineChart"),
@@ -24,14 +25,22 @@ const DynamicStackedLineChart = dynamic(
 function DisplayDollarAmount({
   title,
   amountString,
+  color,
 }: {
   title: string;
   amountString: string;
+  color: string;
 }) {
   return (
-    <div className="">
-      <div className="whitespace-nowrap text-sm font-normal text-text-1">
-        {title}
+    <div>
+      <div className="flex items-center gap-2">
+        <div
+          className="h-3 w-3 rounded-full"
+          style={{ backgroundColor: color }}
+        />
+        <div className="whitespace-nowrap text-sm font-normal text-text-1">
+          {title}
+        </div>
       </div>
       <div className="text-3xl font-medium">{amountString}</div>
     </div>
@@ -91,31 +100,34 @@ const PortfolioPage: NextPage = () => {
         <meta name="description" content="Tax-compliant zk-private trades" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="py-4">
-      <div className="flex justify-between rounded-xl bg-white px-8 py-2">
-        <div className="py-2 text-lg font-medium">
-          {Constants.InstitutionName}
+      <div className="pt-4">
+        <div className="flex justify-between rounded-xl bg-white px-8 py-2">
+          <div className="py-2 text-lg font-medium">
+            {Constants.InstitutionName}
+          </div>
+          <MembersView />
         </div>
-        <MembersView />
-      </div>
       </div>
       <div>
         <div className="flex gap-4">
           <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 py-6">
-            <div className="flex gap-12">
-              <DisplayDollarAmount
-                title="Total Assets"
-                amountString={Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(Constants.TotalAssets)}
-              />
+            <div className="flex items-end gap-12">
+              <div>
+                <div className="whitespace-nowrap text-sm font-normal text-text-1">
+                  Total Assets
+                </div>
+                <div className="text-4xl font-medium">
+                  {`$${fmtComma(Constants.TotalAssets)}`}
+                </div>
+              </div>
               <DisplayDollarAmount
                 title="Whirlwind Deposited Assets"
+                color="red"
                 amountString={`$${formatNumber(totalAssetsValue)}`}
               />
               <DisplayDollarAmount
                 title="Whirlwind Migrated Assets"
+                color="green"
                 amountString={`$${formatNumber(Constants.TradeVolume)}`}
               />
             </div>
