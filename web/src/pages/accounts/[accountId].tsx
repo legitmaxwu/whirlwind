@@ -213,7 +213,7 @@ const SwapAccountPage: CustomPage = () => {
       <div className="flex">
         <div className="p-8">
           <div className="text-lg">{account?.accountTitle}</div>
-          <div className="mt-2 text-3xl font-medium">
+          <div className="text-4xl font-medium">
             {Intl.NumberFormat("en-US", {
               style: "currency",
               currency: "USD",

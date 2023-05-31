@@ -29,10 +29,10 @@ export function SwapLayout({ children }: { children: React.ReactNode }) {
                   "text-gray-400": !selected,
                 })}
               >
-                <div className="truncate text-lg font-medium">
+                <div className="text-base font-medium truncate">
                   {account.accountTitle}
                 </div>
-                <div className="text-md">
+                <div className="text-xl">
                   {`$${formatNumber(totalUSDValue(enrichedAccountBalances))}`}
                 </div>
               </button>
