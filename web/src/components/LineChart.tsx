@@ -18,7 +18,7 @@ export default function LineChart({ data }: LineChartProps) {
   // dimensions
   const width = 600;
   const height = 300;
-  const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+  const margin = { top: 50, right: 0, bottom: 50, left: 0 };
 
   // scales
   const xScale = useMemo(
@@ -58,13 +58,13 @@ export default function LineChart({ data }: LineChartProps) {
       <svg width={width} height={height}>
         {/* <GridRows scale={yScale} width={width} strokeDasharray="2,2" />
         <GridColumns scale={xScale} height={height} strokeDasharray="2,2" /> */}
-        <AxisBottom top={height - margin.bottom} scale={xScale} numTicks={10} />
-        <AxisLeft scale={yScale} left={margin.left} />
+        {/* <AxisBottom top={height - margin.bottom} scale={xScale} numTicks={10} /> */}
+        {/* <AxisLeft scale={yScale} left={margin.left} /> */}
         <LinePath
           data={data}
           x={(d) => xScale(d.date)}
           y={(d) => yScale(d.balance)}
-          stroke={"#000"}
+          stroke={"#9b72cf"}
           strokeWidth={2}
           curve={curveBasis}
         />
