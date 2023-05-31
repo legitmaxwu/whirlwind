@@ -27,7 +27,7 @@ const DynamicStackedLineChart = dynamic(
   }
 );
 
-const WhirlwindAvatar = ({ name }: { name: string }) => {
+export const WhirlwindAvatar = ({ name }: { name: string }) => {
   return (
     <div className="bg-bg-secondary flex h-8 w-8 items-center justify-center rounded-full border text-sm shrink-0">
       {fmtName(name)}

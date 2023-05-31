@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { ProposalsTable } from "../components/ProposalsTable";
 import { MembersView } from "../components/MembersView";
+import { WhirlwindAvatar } from "./home";
 
 export const fmtComma = (s: number, maximumFractionDigits?: number) =>
   s.toLocaleString("en", {
@@ -21,14 +22,14 @@ const ControllerItem = ({
   usdcValue: number;
 }) => {
   return (
-    <div className="flex cursor-pointer justify-between border-b border-b-highlight px-8 py-6 transition-all hover:border-b-black hover:bg-slate-50">
+    <div className="flex cursor-pointer justify-between rounded-lg bg-highlight pl-8 border-b-highlight py-6 transition-all hover:border-b-black hover:bg-slate-50">
       <div>
         <p>{accountName}</p>
         <div className="text-2xl font-medium">{`$${fmtComma(usdcValue)}`}</div>
       </div>
-      <div className="w-48 px-4">
+      <div className="w-60 px-4">
         <div className="flex flex-row items-center gap-2">
-          <div className="h-4 w-4 rounded-full bg-black" />
+          <WhirlwindAvatar name={ownerName}/>
           <p className="font-medium">{ownerName}</p>
         </div>
         <p>{walletAddr}</p>
@@ -62,7 +63,7 @@ const ProposalsPage: NextPage = () => {
           <h1 className="text-2xl font-medium">
             Whirlwind Controller Accounts
           </h1>
-          <div className="my-4 rounded-lg border border-highlight bg-[#f5f6f8]">
+          <div className="flex flex-col gap-4 my-4 rounded-lg">
             <ControllerItem
               accountName="MEV Strategies"
               usdcValue={140234}
