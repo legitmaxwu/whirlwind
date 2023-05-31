@@ -126,7 +126,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
     accountTitle: "MEV Strategies II",
     ...getBalancesAndHistory(
       [
-        { denom: "osmo", quantity: 124 },
+        { denom: "osmo", quantity: 124823 },
         { denom: "atom", quantity: 1251 },
         { denom: "axl", quantity: 50110 },
       ],
@@ -141,7 +141,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
     ...getBalancesAndHistory(
       [
         { denom: "osmo", quantity: 1 },
-        { denom: "atom", quantity: 125 },
+        { denom: "atom", quantity: 824325 },
       ],
       10.2
     ),
@@ -154,7 +154,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
     ...getBalancesAndHistory(
       [
         { denom: "osmo", quantity: 137 },
-        { denom: "axl", quantity: 51200 },
+        { denom: "axl", quantity: 5144200 },
       ],
       1.1
     ),
@@ -165,7 +165,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
 
 export const Constants = {
   InstitutionName: "BlackRock Osmosis Fund II",
-  TotalAssets: 32_307_834.95,
+  TotalAssets: 128_307_834.95,
   TradeVolume: 78_000_000,
   InstitutionMembers: INSTITUTION_MEMBERS,
   ControllerAccounts: INSTITUTION_CONTROLLER_ACCOUNTS,
