@@ -18,6 +18,7 @@ import {
 import { MembersView } from "../../components/MembersView";
 import dynamic from "next/dynamic";
 import { fmtComma } from "../deposits";
+import { fmtName } from "~/lib/fmt";
 
 const DynamicStackedLineChart = dynamic(
   () => import("../../components/StackedLineChart"),
@@ -25,6 +26,14 @@ const DynamicStackedLineChart = dynamic(
     ssr: false,
   }
 );
+
+export const WhirlwindAvatar = ({ name }: { name: string }) => {
+  return (
+    <div className="bg-bg-secondary flex h-8 w-8 items-center justify-center rounded-full border text-sm shrink-0">
+      {fmtName(name)}
+    </div>
+  );
+};
 
 function DisplayDollarAmount({
   title,
@@ -54,7 +63,7 @@ function DisplayDollarAmount({
 const ActivityItem = ({ name, text }: { name: string; text: string }) => {
   return (
     <div className="flex items-center gap-2 py-2">
-      <div className="h-6 w-6 shrink-0 rounded-full bg-black pr-2" />
+      <WhirlwindAvatar name={name}/>
       <p>
         <span className="font-medium">{`${name} `}</span>
         <span className="text-text-1">{text}</span>
@@ -125,8 +134,8 @@ const PortfolioPage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="pt-4">
-        <div className="flex justify-between rounded-xl bg-white px-8 py-2">
-          <div className="py-2 text-lg font-medium">
+        <div className="flex items-center justify-between rounded-xl bg-white px-8 py-2">
+          <div className="text-2xl font-medium">
             {Constants.InstitutionName}
           </div>
           <MembersView />
@@ -134,7 +143,7 @@ const PortfolioPage: NextPage = () => {
       </div>
       <div>
         <div className="flex gap-4">
-          <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 py-6">
+          <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 pt-2 pb-6">
             <div className="flex items-end gap-12">
               <div>
                 <div className="whitespace-nowrap text-sm font-normal text-text-1">
@@ -210,7 +219,7 @@ const PortfolioPage: NextPage = () => {
                   </div>
                   <div className="h-2"></div>
                   <div className="flex gap-2">
-                    <div className="h-6 w-6 rounded-full border bg-black"></div>
+                    <WhirlwindAvatar name={account.assignedTo} />
                     <div className="text-xs font-normal text-text-1">
                       Assigned to
                       <br />

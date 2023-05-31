@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { cn } from "~/lib/utils";
+import { WhirlwindAvatar } from "~/pages/home";
 
 const NAV_PAGES = [
   {
@@ -58,9 +59,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex flex-1 items-center justify-center">
           <MainNav />
         </div>
-        <div className="flex flex-1 items-center justify-end gap-4 text-sm text-primary">
-          Bao Mai
-          <div className="h-7 w-7 rounded-full bg-gray-400"></div>
+        <div className="flex flex-1 items-center justify-end gap-2 text-sm">
+          <p>Bill Ackman</p>
+          <WhirlwindAvatar name={"Bill Ackman"}/>
         </div>
       </div>
       <div className="bg-bg-1">
