@@ -22,6 +22,7 @@ export type DataPoint = {
  * @param interval - The interval between data points, in milliseconds.
  * @return The generated data points.
  */
+
 function calculateHistory(
   initialValue: number,
   finalValue: number,
@@ -58,6 +59,14 @@ function calculateHistory(
 const ONE_MONTH_AGO = new Date(new Date().setMonth(new Date().getMonth() - 1));
 const YESTERDAY = new Date(new Date().setDate(new Date().getDate() - 1));
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
+
+export const OTHER_ASSETS_HISTORY = calculateHistory(
+  10000000,
+  13000000,
+  ONE_MONTH_AGO,
+  YESTERDAY,
+  ONE_DAY_IN_MS
+);
 
 const INSTITUTION_MEMBERS = [
   {
@@ -172,16 +181,16 @@ export const Constants = {
 };
 
 export const TOKEN_LOGOS: { [key: string]: string } = {
-  JUNO: '/tokens/juno.png',
-  ATOM: '/tokens/atom.png',
-  OSMO: '/tokens/osmo.png',
-  USDC: '/tokens/axlusdc.png',
-  NETA: '/tokens/neta.png',
-  STARS: '/tokens/stars.png',
-  RAC: '/tokens/rac.png',
-  WYND: '/tokens/wynd.svg',
-  PHMN: '/tokens/phmn.png',
-  MUSE: '/tokens/muse.png',
-  TORI: '/tokens/tori.png',
-  GLTO: '/tokens/glto.png',
-}
+  JUNO: "/tokens/juno.png",
+  ATOM: "/tokens/atom.png",
+  OSMO: "/tokens/osmo.png",
+  USDC: "/tokens/axlusdc.png",
+  NETA: "/tokens/neta.png",
+  STARS: "/tokens/stars.png",
+  RAC: "/tokens/rac.png",
+  WYND: "/tokens/wynd.svg",
+  PHMN: "/tokens/phmn.png",
+  MUSE: "/tokens/muse.png",
+  TORI: "/tokens/tori.png",
+  GLTO: "/tokens/glto.png",
+};

@@ -1,6 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { Constants, type DataPoint } from "../../lib/constants";
+import {
+  Constants,
+  OTHER_ASSETS_HISTORY,
+  type DataPoint,
+} from "../../lib/constants";
 import { Card, CardTitle } from "../../components/ui/card";
 import { formatNumber } from "../../lib/utils";
 import { BalancesTable } from "../../components/BalancesTable";
@@ -134,9 +138,11 @@ const PortfolioPage: NextPage = () => {
             <DynamicStackedLineChart
               data={mergedHistory.map((item, idx) => {
                 const pastHalfway = idx > mergedHistory.length / 2;
+                const otherAssets = OTHER_ASSETS_HISTORY[idx]?.balance ?? 0;
                 return {
                   date: item.date,
-                  balanceTop: item.balance + 100000,
+                  balanceTop:
+                    item.balance + (pastHalfway ? 50000 : 22000) + otherAssets,
                   balanceMiddle: item.balance + (pastHalfway ? 50000 : 22000),
                   balanceBottom: item.balance,
                 };
