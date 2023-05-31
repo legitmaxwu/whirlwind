@@ -7,6 +7,7 @@ import { cn, formatNumber } from "~/lib/utils";
 import { controllerAccountsAtom } from "../../jotai/balances";
 import { enrichBalancesArray, totalUSDValue } from "../../lib/prices";
 import { Card, CardTitle } from "../ui/card";
+import { fmtComma } from "~/pages/deposits";
 
 export function SwapLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -15,7 +16,7 @@ export function SwapLayout({ children }: { children: React.ReactNode }) {
   const accountId = router.query.accountId as string;
 
   return (
-    <div className="flex w-full">
+    <div className="flex">
       <div className="flex flex-col gap-4 py-8">
         {controllerAccounts.map((account) => {
           const selected = account.id === accountId;
@@ -24,16 +25,16 @@ export function SwapLayout({ children }: { children: React.ReactNode }) {
             <Link key={account.id} href={`/accounts/${account.id}`}>
               <button
                 className={cn({
-                  "w-48 text-right": true,
-                  "text-primary": selected,
-                  "text-gray-400": !selected,
+                  "w-32 text-left": true,
+                  "text-black opacity-100 transition-opaciy": selected,
+                  "opacity-30": !selected,
                 })}
               >
                 <div className="text-base font-medium truncate">
                   {account.accountTitle}
                 </div>
-                <div className="text-xl">
-                  {`$${formatNumber(totalUSDValue(enrichedAccountBalances))}`}
+                <div className="text-base text-text-1">
+                  {`$${fmtComma(totalUSDValue(enrichedAccountBalances))}`}
                 </div>
               </button>
             </Link>
