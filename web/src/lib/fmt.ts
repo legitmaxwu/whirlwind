@@ -7,3 +7,4 @@ export const fmtComma = (s: number, maximumFractionDigits?: number) =>
     maximumFractionDigits: maximumFractionDigits ?? 2,
   });
 
+export const fromMicroDenom = (s: string) => Number(s) / 1e6;

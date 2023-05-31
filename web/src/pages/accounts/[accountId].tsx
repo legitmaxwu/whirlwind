@@ -8,14 +8,14 @@ import { type CustomPage } from "../../types/Page";
 import { SwapLayout } from "../../components/layouts/SwapLayout";
 import { useRouter } from "next/router";
 import { focusAtom } from "jotai-optics";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { enrichBalancesArray, totalUSDValue } from "../../lib/prices";
 import { formatDelta, formatNumber } from "../../lib/utils";
 import dynamic from "next/dynamic";
 import { TOKEN_LOGOS } from "~/lib/constants";
 import { clsx } from "clsx";
-import { fmtAvailable, fmtComma } from "~/lib/fmt";
-import { ArrowDownIcon } from "lucide-react";
+import { fmtAvailable, fmtComma, fromMicroDenom } from "~/lib/fmt";
+import { ArrowDownIcon, ChevronDownIcon } from "lucide-react";
 
 const DynamicLineChart = dynamic(() => import("../../components/LineChart"), {
   ssr: false,
@@ -81,6 +81,95 @@ const SwapField = ({
           onChange={(ev) => onChange(ev.target.value)}
           value={value}
         />
+      </div>
+    </div>
+  );
+};
+
+const SwapInfoDropdown = ({
+  tokenRatioSimple,
+  inputAmount,
+  outputAmount,
+  minOutput,
+  slippage,
+  token0,
+  token1,
+  priceImpact,
+}: {
+  tokenRatioSimple?: string;
+  outputAmount?: number;
+  minOutput?: number;
+  priceImpact?: number;
+
+  inputAmount: number;
+  slippage: number;
+  token0: string;
+  token1: string;
+}) => {
+  const [infoOpen, setInfoOpen] = useState(false);
+
+  return (
+    <div className="border-border-secondary my-2 flex flex-col rounded-lg border bg-slate-50 p-2 px-4 text-sm font-medium text-[#888]">
+      <div
+        className="flex cursor-pointer items-center justify-between"
+        onClick={() => setInfoOpen(!infoOpen)}
+      >
+        <p className={clsx(!tokenRatioSimple && "loading")}>
+          {tokenRatioSimple
+            ? `1 ${token0} ~ ${fromMicroDenom(tokenRatioSimple)} ${token1}`
+            : `Invisible`}
+        </p>
+        <ChevronDownIcon height={14} />
+      </div>
+
+      <div
+        className={clsx(
+          "100ms w-full overflow-hidden text-sm transition-[height] ease-in-out",
+          infoOpen ? "h-48" : "h-0"
+        )}
+      >
+        <div className="py-2 font-normal">
+          <div className="pb-2">
+            <span>
+              {`You are swapping ${fmtComma(
+                inputAmount
+              )} ${token0} for a minimum of `}
+            </span>
+            <span className={clsx(minOutput == undefined && "loading")}>
+              {minOutput != undefined ? `${fmtComma(minOutput)}` : "Invisible"}
+            </span>
+            <span>
+              {` ${token1} (${slippage * 100}% slippage). 
+        Once signed, the order cannot be canceled, but will expire within 10 seconds.`}
+            </span>
+          </div>
+          <div className="flex flex-row justify-between py-1">
+            <p>Estimated output</p>
+            <p>
+              <span className={clsx(outputAmount == undefined && "loading")}>
+                {outputAmount ?? "Invisible"}
+              </span>
+              {` ${token1}`}
+            </p>
+          </div>
+          <div className="flex flex-row justify-between">
+            <p>Minimum output</p>
+            <p>
+              <span className={clsx(minOutput == undefined && "loading")}>
+                {minOutput ?? "Invisible"}
+              </span>
+              {` ${token1}`}
+            </p>
+          </div>
+          <div className="flex flex-row justify-between py-1">
+            <p>Price impact</p>
+            <p className={clsx(priceImpact == undefined && "loading")}>
+              {priceImpact != undefined
+                ? `${fmtComma(priceImpact * 100)}%`
+                : "Invisible"}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -153,24 +242,43 @@ const SwapAccountPage: CustomPage = () => {
         <div className="h-full w-px bg-gray-300"></div>
         {/* Swap section */}
         <div className="w-full flex-1 shrink-0 px-4 py-4">
-          <h1 className="text-lg font-medium py-2">Swap</h1>
+          <h1 className="py-2 text-lg font-medium">Swap</h1>
           {/* Inputs */}
-          <div className="flex flex-col gap-2 items-center">
-          <SwapField
-            symbol={"USDC"}
-            selected={false}
-            available={12432.8}
-            onChange={() => {}}
-          />
-          <div className="-my-5 bg-highlight rounded-full p-2 z-10 border border-highlight">
-            <ArrowDownIcon height={18}/>
+          <div className="flex flex-col items-center gap-2">
+            <SwapField
+              symbol={"USDC"}
+              selected={false}
+              available={12432.8}
+              onChange={() => {}}
+            />
+            <div className="z-10 -my-5 rounded-full border border-highlight bg-highlight p-2">
+              <ArrowDownIcon height={18} />
             </div>
-              <SwapField
-            symbol={"OSMO"}
-            selected={false}
-            available={480323.8}
-            onChange={() => {}}
-          />
+            <SwapField
+              symbol={"OSMO"}
+              selected={false}
+              available={480323.8}
+              onChange={() => {}}
+            />
+            <div className="flex w-full justify-between px-4">
+              <p>Estimated value</p>
+              <p>$0.00</p>
+            </div>
+            <div className="flex w-full justify-between px-4">
+              <p>Estimated cost</p>
+              <p>$0.00</p>
+            </div>
+            <div>
+            <SwapInfoDropdown
+              inputAmount={324}
+              outputAmount={459.49}
+              minOutput={420.34}
+              slippage={0.01}
+              token0={token0}
+              token1={token1}
+              tokenRatioSimple="3"
+            />
+            </div>
           </div>
         </div>
       </div>
