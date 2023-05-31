@@ -92,7 +92,7 @@ const PortfolioPage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="py-4">
-      <div className="flex justify-between rounded-xl border border-highlight bg-white px-4 py-2">
+      <div className="flex justify-between rounded-xl bg-white px-8 py-2">
         <div className="py-2 text-lg font-medium">
           {Constants.InstitutionName}
         </div>
@@ -101,7 +101,7 @@ const PortfolioPage: NextPage = () => {
       </div>
       <div>
         <div className="flex gap-4">
-          <div className="flex flex-1 flex-col gap-8 rounded-lg border border-highlight bg-white px-8 py-6">
+          <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 py-6">
             <div className="flex gap-12">
               <DisplayDollarAmount
                 title="Total Assets"
@@ -130,7 +130,7 @@ const PortfolioPage: NextPage = () => {
           </div>
 
           {/* Activity Section */}
-          <div className="max-w-xs shrink-0 rounded-lg border border-highlight bg-white px-6 py-6 text-sm">
+          <div className="max-w-xs shrink-0 rounded-lg  bg-white px-6 py-6 text-sm">
             <h1 className="text-lg font-medium">Activity</h1>
             <ActivityItem
               name="Max Wu"
@@ -157,7 +157,7 @@ const PortfolioPage: NextPage = () => {
 
         <div className="h-4" />
 
-        <div className="rounded-lg border border-highlight bg-white px-8 py-6">
+        <div className="rounded-lg bg-white px-8 py-6">
           <div className="text-xl font-medium">
             Whirlwind Controller Accounts
           </div>
@@ -196,7 +196,7 @@ const PortfolioPage: NextPage = () => {
           </div>
         </div>
         <div className="h-4" />
-        <div className="rounded-lg border border-highlight bg-white px-8 py-6">
+        <div className="rounded-lg bg-white px-8 py-6">
           <div className="text-xl font-medium">Holdings</div>
           <div className="h-2"></div>
           <BalancesTable balanceRows={enrichedBalances} />

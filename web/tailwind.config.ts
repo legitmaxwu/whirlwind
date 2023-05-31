@@ -13,7 +13,7 @@ export default {
     },
     extend: {
       colors: {
-        "bg-1": "#f5f6f8",
+        "bg-1": "rgba(245, 246, 248, 0)",
         "text-1": "rgb(112, 112, 112)",
         "highlight": "#f2f2f2",
         border: "hsl(var(--border))",
