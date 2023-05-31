@@ -142,8 +142,11 @@ const PortfolioPage: NextPage = () => {
                 return {
                   date: item.date,
                   balanceTop:
-                    item.balance + (pastHalfway ? 50000 : 22000) + otherAssets,
-                  balanceMiddle: item.balance + (pastHalfway ? 50000 : 22000),
+                    item.balance +
+                    (pastHalfway ? 4900000 : 1900000) +
+                    otherAssets,
+                  balanceMiddle:
+                    item.balance + (pastHalfway ? 4900000 : 1900000),
                   balanceBottom: item.balance,
                 };
               })}
