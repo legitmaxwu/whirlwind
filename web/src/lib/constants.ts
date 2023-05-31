@@ -123,7 +123,7 @@ const INSTITUTION_CONTROLLER_ACCOUNTS: ControllerAccount[] = [
   },
   {
     id: nanoid(),
-    accountTitle: "Longevity Fund II Multisig 1",
+    accountTitle: "MEV Strategies II",
     ...getBalancesAndHistory(
       [
         { denom: "osmo", quantity: 124 },

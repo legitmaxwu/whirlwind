@@ -213,7 +213,7 @@ const SwapAccountPage: CustomPage = () => {
       <div className="flex">
         <div className="p-8">
           <div className="text-lg">{account?.accountTitle}</div>
-          <div className="mt-2 text-3xl font-medium">
+          <div className="text-4xl font-medium">
             {Intl.NumberFormat("en-US", {
               style: "currency",
               currency: "USD",
@@ -260,11 +260,11 @@ const SwapAccountPage: CustomPage = () => {
               available={480323.8}
               onChange={() => {}}
             />
-            <div className="flex w-full justify-between px-4">
+            <div className="flex w-full justify-between px-4 text-sm">
               <p>Estimated value</p>
               <p>$0.00</p>
             </div>
-            <div className="flex w-full justify-between px-4">
+            <div className="flex w-full justify-between px-4 text-sm">
               <p>Estimated cost</p>
               <p>$0.00</p>
             </div>
@@ -273,12 +273,16 @@ const SwapAccountPage: CustomPage = () => {
                 inputAmount={324}
                 outputAmount={459.49}
                 minOutput={420.34}
+                priceImpact={0.04}
                 slippage={0.01}
                 token0={token0}
                 token1={token1}
                 tokenRatioSimple="3"
               />
             </div>
+            <button className="w-full rounded-lg bg-blue-800 py-2 text-white">
+              Swap
+            </button>
           </div>
         </div>
       </div>
