@@ -79,3 +79,14 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Prevent number UX */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+

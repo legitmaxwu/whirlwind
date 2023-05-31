@@ -170,3 +170,18 @@ export const Constants = {
   InstitutionMembers: INSTITUTION_MEMBERS,
   ControllerAccounts: INSTITUTION_CONTROLLER_ACCOUNTS,
 };
+
+export const TOKEN_LOGOS: { [key: string]: string } = {
+  JUNO: '/tokens/juno.png',
+  ATOM: '/tokens/atom.png',
+  OSMO: '/tokens/osmo.png',
+  USDC: '/tokens/axlusdc.png',
+  NETA: '/tokens/neta.png',
+  STARS: '/tokens/stars.png',
+  RAC: '/tokens/rac.png',
+  WYND: '/tokens/wynd.svg',
+  PHMN: '/tokens/phmn.png',
+  MUSE: '/tokens/muse.png',
+  TORI: '/tokens/tori.png',
+  GLTO: '/tokens/glto.png',
+}
