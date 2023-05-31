@@ -3,6 +3,7 @@ import Head from "next/head";
 import { ProposalsTable } from "../components/ProposalsTable";
 import { MembersView } from "../components/MembersView";
 import { WhirlwindAvatar } from "./home";
+import { Constants } from "~/lib/constants";
 
 export const fmtComma = (s: number, maximumFractionDigits?: number) =>
   s.toLocaleString("en", {
@@ -49,12 +50,12 @@ const ProposalsPage: NextPage = () => {
 
       <div className="items-left flex flex-col justify-center px-8 py-4">
         {/* Header II */}
-        <div className="flex justify-between">
-          <div className="py-2 text-lg font-medium">
-            BlackRock Osmosis Fund II
+        <div className="flex items-center justify-between rounded-xl bg-white py-2">
+          <div className="text-2xl font-medium">
+            {Constants.InstitutionName}
           </div>
           <MembersView />
-        </div>
+      </div>
         <h1 className="text-2xl font-medium">
           Deposit and Migration Proposals
         </h1>
