@@ -92,12 +92,12 @@ const PortfolioPage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="py-4">
-      <div className="flex justify-between rounded-xl bg-white px-8 py-2">
-        <div className="py-2 text-lg font-medium">
-          {Constants.InstitutionName}
+        <div className="flex justify-between rounded-xl bg-white px-8 py-2">
+          <div className="py-2 text-lg font-medium">
+            {Constants.InstitutionName}
+          </div>
+          <MembersView />
         </div>
-        <MembersView />
-      </div>
       </div>
       <div>
         <div className="flex gap-4">
@@ -198,7 +198,7 @@ const PortfolioPage: NextPage = () => {
         <div className="h-4" />
         <div className="rounded-lg bg-white px-8 py-6">
           <div className="text-xl font-medium">Holdings</div>
-          <div className="h-2"></div>
+          <div className="h-4"></div>
           <BalancesTable balanceRows={enrichedBalances} />
 
           <div className="h-4" />
