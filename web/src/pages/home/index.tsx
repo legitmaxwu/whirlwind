@@ -91,11 +91,13 @@ const PortfolioPage: NextPage = () => {
         <meta name="description" content="Tax-compliant zk-private trades" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="-mx-4 my-8 flex justify-between rounded-xl border border-highlight bg-white px-4 py-2">
+      <div className="py-4">
+      <div className="flex justify-between rounded-xl border border-highlight bg-white px-4 py-2">
         <div className="py-2 text-lg font-medium">
           {Constants.InstitutionName}
         </div>
         <MembersView />
+      </div>
       </div>
       <div>
         <div className="flex gap-4">
