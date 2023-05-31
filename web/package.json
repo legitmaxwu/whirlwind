@@ -21,6 +21,7 @@
     "chain-registry": "^1.14.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
+    "date-fns": "^2.30.0",
     "jotai": "^2.1.0",
     "jotai-optics": "^0.3.0",
     "lucide-react": "^0.221.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@chain-registry/types": "^0.16.0",
+    "@types/d3-array": "^3.0.5",
     "@types/eslint": "^8.37.0",
     "@types/node": "^18.16.0",
     "@types/numeral": "^2.0.2",

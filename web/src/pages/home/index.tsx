@@ -97,6 +97,26 @@ const PortfolioPage: NextPage = () => {
     return newHistoryObj;
   }, [controllerAccounts]);
 
+  const CURR_DEPOSITED_ASSETS = 4900000;
+  const lineChartsData = useMemo(() => {
+    return mergedHistory.map((item, idx) => {
+      const pastHalfway = idx > mergedHistory.length / 2;
+      const otherAssets = OTHER_ASSETS_HISTORY[idx]?.balance ?? 0;
+      return {
+        date: item.date,
+        balanceTop:
+          item.balance +
+          (pastHalfway ? CURR_DEPOSITED_ASSETS : 1900000) +
+          otherAssets,
+        balanceMiddle:
+          item.balance + (pastHalfway ? CURR_DEPOSITED_ASSETS : 1900000),
+        balanceBottom: item.balance,
+      };
+    });
+  }, [mergedHistory]);
+
+  const totalValue = lineChartsData[lineChartsData.length - 1]?.balanceTop ?? 0;
+
   return (
     <div>
       <Head>
@@ -121,13 +141,13 @@ const PortfolioPage: NextPage = () => {
                   Total Assets
                 </div>
                 <div className="text-4xl font-medium">
-                  {`$${fmtComma(Constants.TotalAssets)}`}
+                  {`$${fmtComma(totalValue)}`}
                 </div>
               </div>
               <DisplayDollarAmount
                 title="Whirlwind Deposited Assets"
                 color="#9b72cf"
-                amountString={`$${formatNumber(50000)}`}
+                amountString={`$${formatNumber(CURR_DEPOSITED_ASSETS)}`}
               />
               <DisplayDollarAmount
                 title="Whirlwind Migrated Assets"
@@ -135,22 +155,7 @@ const PortfolioPage: NextPage = () => {
                 amountString={`$${formatNumber(totalAssetsValue)}`}
               />
             </div>
-            <DynamicStackedLineChart
-              data={mergedHistory.map((item, idx) => {
-                const pastHalfway = idx > mergedHistory.length / 2;
-                const otherAssets = OTHER_ASSETS_HISTORY[idx]?.balance ?? 0;
-                return {
-                  date: item.date,
-                  balanceTop:
-                    item.balance +
-                    (pastHalfway ? 4900000 : 1900000) +
-                    otherAssets,
-                  balanceMiddle:
-                    item.balance + (pastHalfway ? 4900000 : 1900000),
-                  balanceBottom: item.balance,
-                };
-              })}
-            />
+            <DynamicStackedLineChart data={lineChartsData} />
           </div>
 
           {/* Activity Section */}
