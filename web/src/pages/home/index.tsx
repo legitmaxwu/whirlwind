@@ -114,8 +114,8 @@ const PortfolioPage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="pt-4">
-        <div className="flex justify-between rounded-xl bg-white px-8 py-2">
-          <div className="py-2 text-lg font-medium">
+        <div className="flex items-center justify-between rounded-xl bg-white px-8 py-2">
+          <div className="text-2xl font-medium">
             {Constants.InstitutionName}
           </div>
           <MembersView />
@@ -123,7 +123,7 @@ const PortfolioPage: NextPage = () => {
       </div>
       <div>
         <div className="flex gap-4">
-          <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 py-6">
+          <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 pt-2 pb-6">
             <div className="flex items-end gap-12">
               <div>
                 <div className="whitespace-nowrap text-sm font-normal text-text-1">
