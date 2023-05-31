@@ -22,6 +22,7 @@ interface StackedLineChartProps {
   data: DataPoint[];
 }
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const bisectDate = bisector<DataPoint, Date>((d) => d.date).left;
 
 export default function StackedLineChart({ data }: StackedLineChartProps) {
@@ -85,7 +86,7 @@ export default function StackedLineChart({ data }: StackedLineChartProps) {
       showTooltip({
         tooltipData: d,
         tooltipLeft: x,
-        tooltipTop: yScale(d.balanceTop),
+        tooltipTop: yScale(d?.balanceTop ?? 0),
       });
     },
     [showTooltip, xScale, yScale, data]

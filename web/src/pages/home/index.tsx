@@ -29,7 +29,7 @@ const DynamicStackedLineChart = dynamic(
 
 export const WhirlwindAvatar = ({ name }: { name: string }) => {
   return (
-    <div className="bg-bg-secondary flex h-8 w-8 items-center justify-center rounded-full border text-sm shrink-0">
+    <div className="bg-bg-secondary flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm">
       {fmtName(name)}
     </div>
   );
@@ -63,7 +63,7 @@ function DisplayDollarAmount({
 const ActivityItem = ({ name, text }: { name: string; text: string }) => {
   return (
     <div className="flex items-center gap-2 py-2">
-      <WhirlwindAvatar name={name}/>
+      <WhirlwindAvatar name={name} />
       <p>
         <span className="font-medium">{`${name} `}</span>
         <span className="text-text-1">{text}</span>
@@ -143,7 +143,7 @@ const PortfolioPage: NextPage = () => {
       </div>
       <div>
         <div className="flex gap-4">
-          <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 pt-2 pb-6">
+          <div className="flex flex-1 flex-col gap-8 rounded-lg bg-white px-8 pb-6 pt-2">
             <div className="flex items-end gap-12">
               <div>
                 <div className="whitespace-nowrap text-sm font-normal text-text-1">
@@ -159,7 +159,7 @@ const PortfolioPage: NextPage = () => {
                 amountString={`$${formatNumber(CURR_DEPOSITED_ASSETS)}`}
               />
               <DisplayDollarAmount
-                title="Whirlwind Migrated Assets"
+                title="Migrated Assets (Private)"
                 color="#532b88"
                 amountString={`$${formatNumber(totalAssetsValue)}`}
               />
@@ -197,7 +197,7 @@ const PortfolioPage: NextPage = () => {
 
         <div className="rounded-lg bg-white px-8 py-6">
           <div className="text-xl font-medium">
-            Whirlwind Controller Accounts
+            Anonymous Controller Accounts
           </div>
           <div className="h-4"></div>
           <div className="flex flex-wrap gap-4">

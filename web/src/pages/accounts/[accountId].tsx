@@ -249,6 +249,7 @@ const SwapAccountPage: CustomPage = () => {
               symbol={"USDC"}
               selected={false}
               available={12432.8}
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
               onChange={() => {}}
             />
             <div className="z-10 -my-5 rounded-full border border-highlight bg-highlight p-2">
@@ -258,6 +259,7 @@ const SwapAccountPage: CustomPage = () => {
               symbol={"OSMO"}
               selected={false}
               available={480323.8}
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
               onChange={() => {}}
             />
             <div className="flex w-full justify-between px-4 text-sm">
