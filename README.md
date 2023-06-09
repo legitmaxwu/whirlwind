@@ -17,14 +17,14 @@
 - `generate-data`: Generate data for SNARK proofs
 - `generate-proofs`: Generate SNARK proofs
 
-## Overview
-
-Whirlwind allows for temporarily private trades on Osmosis until withdrawal.
-  
 ## Videos
 
 - [Explainer](https://www.youtube.com/watch?v=VEml3-SGLaY)
 - [Demo](https://www.youtube.com/watch?v=ykclf-4oNKY)
+  
+## Overview
+
+Whirlwind allows for temporarily private trades on Osmosis until withdrawal.
 
 ### Using Whirlwind
 1. User deposits funds from main wallet into Whirlwind via an anonymity pool.
